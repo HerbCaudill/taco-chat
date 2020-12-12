@@ -12,7 +12,7 @@ export const App = () => {
             <Input className="mt-1"></Input>
           </Label>
           <div className="my-3 text-right">
-            <Button>OK</Button>
+            <Button className="min-w-24">OK</Button>
           </div>
         </CardBody>
       </Card>
