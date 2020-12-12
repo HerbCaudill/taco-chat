@@ -1,5 +1,3 @@
-function App() {
-  return <div className="bg-red-500">asdf</div>
+export const App = () => {
+  return <div className="bg-blue-500">asdf</div>
 }
-
-export default App
