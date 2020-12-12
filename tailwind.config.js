@@ -21,6 +21,12 @@ module.exports = windmill({
         danger: colors.red,
       },
       fontSize: {},
+      fontWeight: {
+        thin: 200,
+        normal: 400,
+        bold: 600,
+        extrabold: 800,
+      },
     },
   },
   future: {

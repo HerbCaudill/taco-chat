@@ -82,7 +82,7 @@
   },
   // Textarea
   textarea: {
-    base: 'block w-full text-sm dark:text-neutral-300 form-textarea focus:outline-none',
+    base: 'block text-sm dark:text-neutral-300 form-textarea focus:outline-none',
     active:
       'focus:border-primary-400 dark:border-neutral-600 dark:focus:border-neutral-600 dark:bg-neutral-700 dark:focus:shadow-outline-neutral focus:shadow-outline-primary',
     disabled: 'cursor-not-allowed opacity-50 bg-neutral-300 dark:bg-neutral-800',
@@ -93,7 +93,7 @@
   },
   // Select
   select: {
-    base: 'block w-full text-sm dark:text-neutral-300 focus:outline-none',
+    base: 'block text-sm dark:text-neutral-300 focus:outline-none',
     active:
       'focus:border-primary-400 dark:border-neutral-600 dark:bg-neutral-700 focus:shadow-outline-primary dark:focus:shadow-outline-neutral dark:focus:border-neutral-600',
     select: 'form-select leading-5',
@@ -113,8 +113,7 @@
   },
   // Input
   input: {
-    base:
-      'block w-full text-sm font-mono focus:outline-none dark:text-neutral-300 form-input leading-5',
+    base: 'block text-sm font-mono focus:outline-none dark:text-neutral-300 form-input leading-5',
     active:
       'focus:border-primary-400 dark:border-neutral-600 focus:shadow-outline-primary dark:focus:border-neutral-600 dark:focus:shadow-outline-neutral dark:bg-neutral-700',
     disabled: 'cursor-not-allowed opacity-50 bg-neutral-300 dark:bg-neutral-800',
