@@ -4,13 +4,13 @@
   "private": false,
   "version": "0.1.0",
   "scripts": {
-    "build": "react-scripts build",
     "build:css": "postcss src/index.postcss -o public/index.css",
     "prebuild": "yarn build:css",
+    "build": "react-scripts build",
+    "dev": "run-p watch start",
     "start": "react-scripts start",
     "test": "react-scripts test",
-    "watch": "nodemon -x yarn build:css -w tailwind.config.js",
-    "dev": "run-p watch start"
+    "watch": "nodemon -x yarn build:css"
   },
   "dependencies": {
     "@ibm/plex": "^5.1.3",
@@ -38,6 +38,14 @@
     "semi": false,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "nodemon": {
+    "watch": [
+      "postcss.config.js",
+      "tailwind.config.js",
+      "src/index.postcss",
+      "src/theme.ts"
+    ]
   },
   "browserslist": {
     "development": [
