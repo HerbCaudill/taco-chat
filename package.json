@@ -2,6 +2,7 @@
   "name": "taco-chat",
   "version": "0.1.0",
   "private": false,
+  "license": "MIT",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
