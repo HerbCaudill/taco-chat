@@ -1,7 +1,5 @@
-import React from 'react'
-
 function App() {
-  return <div className="App">asdf</div>
+  return <div className="bg-green-500">asdf</div>
 }
 
 export default App
