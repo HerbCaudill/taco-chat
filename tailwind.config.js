@@ -1,15 +1,21 @@
 const windmill = require('@windmill/react-ui/config')
 const { colors, fontSize } = require('tailwindcss/defaultTheme')
 
+const emoji = 'Segoe UI Emoji'
+const mono = 'IBM Plex Mono'
+const sans = 'IBM Plex Sans'
+const condensed = 'IBM Plex Sans Condensed'
+const serif = 'IBM Plex Serif'
+
 module.exports = windmill({
   purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/**/*.html'],
   theme: {
     extend: {
       fontFamily: {
-        mono: ['IBM Plex Mono', 'Segoe UI Emoji', 'monospace'],
-        sans: ['IBM Plex Sans', 'Segoe UI Emoji', 'sans-serif'],
-        condensed: ['IBM Plex Sans Condensed', 'Segoe UI Emoji', 'sans-serif'],
-        serif: ['IBM Plex Serif', 'Segoe UI Emoji', 'serif'],
+        mono: [mono, emoji, 'monospace'],
+        sans: [sans, emoji, 'sans-serif'],
+        condensed: [condensed, emoji, 'sans-serif'],
+        serif: [serif, emoji, 'serif'],
       },
       zIndex: {},
       colors: {
@@ -23,7 +29,7 @@ module.exports = windmill({
       fontSize: {},
       fontWeight: {
         thin: 200,
-        normal: 400,
+        normal: 500,
         bold: 600,
         extrabold: 800,
       },
