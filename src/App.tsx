@@ -4,12 +4,13 @@ import { Device } from './Device'
 import { UserInfo, users } from './users'
 import { DeviceInfo, devices } from './devices'
 
-interface Peer {
+export interface Peer {
   user: UserInfo
   device: DeviceInfo
 }
 
 const initialPeers: Peer[] = []
+
 export const App = () => {
   const [peers, setPeers] = useState<Peer[]>(initialPeers)
 
@@ -22,7 +23,7 @@ export const App = () => {
       {peers.map((peer) => (
         <Device key={`${peer.user.name}:${peer.device.name}`} {...peer}></Device>
       ))}
-      <Chooser onSelect={onSelect}></Chooser>
+      <Chooser onSelect={onSelect} selected={peers}></Chooser>
     </div>
   )
 }
