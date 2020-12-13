@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, Select } from '@windmill/react-ui'
 
-export const Chooser = () => {
+export const Chooser = ({ onSelect }: ChooserProps) => {
   return (
     <div className="px-3">
       <div className="flex">
@@ -18,4 +18,8 @@ export const Chooser = () => {
       <Button className="w-full block text-lg h-10">Add</Button>
     </div>
   )
+}
+
+interface ChooserProps {
+  onSelect: () => {}
 }
