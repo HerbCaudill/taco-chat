@@ -1,47 +1,41 @@
 import { Button, Select } from '@windmill/react-ui'
 import { useRef, useState } from 'react'
 import { Peer } from './App'
-import { DeviceInfo, devices as deviceMap } from './devices'
-import { UserInfo, users as userMap } from './users'
+import { devices as deviceMap } from './devices'
+import { users as userMap } from './users'
 
-export const Chooser = ({ onSelect, selected }: ChooserProps) => {
-  const userSelect = useRef() as React.MutableRefObject<HTMLSelectElement>
-  const deviceSelect = useRef() as React.MutableRefObject<HTMLSelectElement>
+export const Chooser = ({ onSelect }: ChooserProps) => {
+  const peerSelect = useRef() as React.MutableRefObject<HTMLSelectElement>
 
   const users = Object.values(userMap)
   const devices = Object.values(deviceMap)
-  const [userName, setUserName] = useState(users[0].name)
-  const [deviceName, setDeviceName] = useState(devices[0].name)
+  const allPeers = users.flatMap((user) => devices.map((device) => ({ user, device }))) as Peer[]
+
+  const [peers, setPeers] = useState(allPeers)
+
+  const [selectedPeer, setSelectedPeer] = useState(allPeers[0])
 
   const onClickAdd = () => {
-    const user = userMap[userName]
-    const device = deviceMap[deviceName]
-    return onSelect(user, device)
+    setPeers((peers) => {
+      peers = peers.filter((p) => !isEqual(p, selectedPeer))
+      setSelectedPeer(peers[0])
+      return peers
+    })
+    onSelect(selectedPeer)
   }
 
   return (
     <div className="px-3">
       <div className="flex">
         <Select
-          ref={userSelect}
-          onChange={() => setUserName(userSelect.current.value)}
+          ref={peerSelect}
+          onChange={() => setSelectedPeer(JSON.parse(peerSelect.current.value))}
           className="w-full flex-grow my-3 mr-3 h-10 font-normal text-lg"
           autoFocus={true}
         >
-          {users.map((user) => (
-            <option key={user.name} value={user.name}>
-              {user.emoji} {user.name}
-            </option>
-          ))}
-        </Select>
-        <Select
-          ref={deviceSelect}
-          onChange={() => setDeviceName(deviceSelect.current.value)}
-          className="w-full flex-1 min-w-24 my-3 h-10 text-lg"
-        >
-          {devices.map((device) => (
-            <option key={device.name} value={device.name}>
-              {device.emoji}
+          {peers.map((p) => (
+            <option key={JSON.stringify(p)} value={JSON.stringify(p)}>
+              {p.user.emoji} {p.user.name} {p.device.emoji} {p.device.name}
             </option>
           ))}
         </Select>
@@ -54,6 +48,7 @@ export const Chooser = ({ onSelect, selected }: ChooserProps) => {
 }
 
 interface ChooserProps {
-  onSelect: (user: UserInfo, device: DeviceInfo) => void
-  selected: Peer[]
+  onSelect: (peer: Peer) => void
 }
+
+const isEqual = (a: Peer, b: Peer) => a.user.name === b.user.name && a.device.name === b.device.name
