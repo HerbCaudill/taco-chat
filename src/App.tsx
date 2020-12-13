@@ -7,16 +7,19 @@ interface Peer {
   deviceName: string
 }
 
-const initialPeers: Peer[] = [{ userName: 'Alice', deviceName: 'laptop' }]
+const initialPeers: Peer[] = []
 export const App = () => {
   const [peers, setPeers] = useState<Peer[]>(initialPeers)
+const onSelect = () => {
+  setPeers([])
+}
 
   return (
     <div className="flex p-3">
       {peers.map((peer) => (
         <Device {...peer}></Device>
       ))}
-      <Chooser></Chooser>
+      <Chooser onSelect={onSelect}></Chooser>
     </div>
   )
 }
