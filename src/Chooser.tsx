@@ -22,7 +22,6 @@ export const Chooser = ({ onAdd, peers }: ChooserProps) => {
     </div>
   )
 }
-
 interface ChooserProps {
   onAdd: (id: string) => void
   peers: PeerMap

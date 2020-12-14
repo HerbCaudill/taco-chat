@@ -15,8 +15,14 @@ export const Peer = ({ id, user, device, onRemove }: PeerProps) => (
     <CardBody></CardBody>
   </Card>
 )
+interface PeerProps {
+  user: UserInfo
+  device: DeviceInfo
+  id: string
+  onRemove: (id: string) => void
+}
 
-export const RemoveButton = ({ onClick }: RemoveButtonProps) => (
+const RemoveButton = ({ onClick }: RemoveButtonProps) => (
   <div className="opacity-0 group-hover:opacity-100">
     <button
       className="absolute top-0 right-0 p-1 m-2 leading-none opacity-25 rounded-full 
@@ -29,6 +35,9 @@ export const RemoveButton = ({ onClick }: RemoveButtonProps) => (
     </button>
   </div>
 )
+interface RemoveButtonProps {
+  onClick: () => void
+}
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(function Avatar(props, ref) {
   const { size = 'md', className, children } = props
@@ -45,18 +54,6 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(function Avatar(pro
     </div>
   )
 })
-
 interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: 'lg' | 'md' | 'sm'
-}
-
-interface RemoveButtonProps {
-  onClick: () => void
-}
-
-interface PeerProps {
-  user: UserInfo
-  device: DeviceInfo
-  id: string
-  onRemove: (id: string) => void
 }
