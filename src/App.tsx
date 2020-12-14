@@ -3,6 +3,8 @@ import { Chooser } from './Chooser'
 import { Peer } from './Peer'
 import { peers as allPeers, PeerMap } from './peers'
 
+allPeers['Alice:laptop'].added = true
+
 export const App = () => {
   const [peers, setPeers] = useState<PeerMap>(allPeers)
 
