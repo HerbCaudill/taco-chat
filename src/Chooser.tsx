@@ -8,8 +8,12 @@ export const Chooser = ({ onAdd, peers }: ChooserProps) => {
   const onChange = () => onAdd(peerSelect.current.value)
 
   return (
-    <div>
-      <Select ref={peerSelect} className="h-10 font-normal text-lg" onChange={onChange}>
+    <div className="group">
+      <Select
+        ref={peerSelect}
+        className="opacity-25 group-hover:opacity-100 h-10 font-normal text-lg"
+        onChange={onChange}
+      >
         <option>Add...</option>
         {Object.values(peers)
           .filter(p => !p.added)
@@ -22,6 +26,7 @@ export const Chooser = ({ onAdd, peers }: ChooserProps) => {
     </div>
   )
 }
+
 interface ChooserProps {
   onAdd: (id: string) => void
   peers: PeerMap
