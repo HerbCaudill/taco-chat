@@ -17,7 +17,7 @@ const peerArray = devices.flatMap(device =>
   )
 )
 
-export const peers = peerArray.reduce(arrayToMap('id'), {})
+export const peers = peerArray.reduce(arrayToMap('id'), {}) as PeerMap
 
 export interface PeerInfo {
   user: UserInfo
