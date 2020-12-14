@@ -1,29 +1,26 @@
 import React, { useState } from 'react'
 import { Chooser } from './Chooser'
-import { Device } from './Device'
-import { DeviceInfo } from './devices'
-import { UserInfo } from './users'
-
-export interface Peer {
-  user: UserInfo
-  device: DeviceInfo
-}
-
-const initialPeers: Peer[] = []
+import { Peer } from './Peer'
+import { peers as allPeers, PeerMap } from './peers'
 
 export const App = () => {
-  const [peers, setPeers] = useState<Peer[]>(initialPeers)
+  const [peers, setPeers] = useState<PeerMap>(allPeers)
 
-  const onSelect = (peer: Peer) => {
-    setPeers((peers) => [...peers, peer])
+  const onAdd = (id: string) => {
+    setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: true } }))
+  }
+  const onRemove = (id: string) => {
+    setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: false } }))
   }
 
   return (
     <div className="flex p-3 gap-3" style={{ minWidth: 2400 }}>
-      {peers.map((peer) => (
-        <Device key={`${peer.user.name}:${peer.device.name}`} {...peer}></Device>
-      ))}
-      <Chooser onSelect={onSelect}></Chooser>
+      {Object.values(peers)
+        .filter(p => p.added)
+        .map(p => (
+          <Peer key={p.id} onRemove={onRemove} {...p}></Peer>
+        ))}
+      <Chooser onAdd={onAdd} peers={peers}></Chooser>
     </div>
   )
 }

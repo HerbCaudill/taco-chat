@@ -19,8 +19,8 @@ module.exports = windmill({
       },
       zIndex: {},
       colors: {
-        primary: colors.teal,
-        secondary: colors.blue,
+        primary: colors.blue,
+        secondary: colors.teal,
         neutral: colors.gray,
         success: colors.green,
         warning: colors.orange,
@@ -34,6 +34,10 @@ module.exports = windmill({
         extrabold: 800,
       },
     },
+  },
+  variants: {
+    opacity: ({ after }) => after(['group-hover']),
+    textColor: ({ after }) => after(['group-hover']),
   },
   future: {
     removeDeprecatedGapUtilities: true,

@@ -1,0 +1,29 @@
+﻿import { arrayToMap } from './arrayToMap'
+import { DeviceInfo, devices as deviceMap } from './devices'
+import { UserInfo, users as userMap } from './users'
+
+const users = Object.values(userMap)
+const devices = Object.values(deviceMap)
+
+const peerArray = devices.flatMap(device =>
+  users.map(
+    user =>
+      ({
+        user,
+        device,
+        id: `${user.name}:${device.name}`,
+        added: false,
+      } as PeerInfo)
+  )
+)
+
+export const peers = peerArray.reduce(arrayToMap('id'), {})
+
+export interface PeerInfo {
+  user: UserInfo
+  device: DeviceInfo
+  id: string
+  added: boolean
+}
+
+export type PeerMap = Record<string, PeerInfo>
