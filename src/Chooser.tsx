@@ -5,16 +5,12 @@ import { PeerMap } from './peers'
 export const Chooser = ({ onAdd, peers }: ChooserProps) => {
   const peerSelect = useRef() as React.MutableRefObject<HTMLSelectElement>
 
+  const onChange = () => onAdd(peerSelect.current.value)
+
   return (
     <div>
-      <Select
-        ref={peerSelect}
-        className="h-10 font-normal text-lg"
-        onChange={() => onAdd(peerSelect.current.value)}
-      >
-        <option key={''} value={''}>
-          Add...
-        </option>
+      <Select ref={peerSelect} className="h-10 font-normal text-lg" onChange={onChange}>
+        <option>Add...</option>
         {Object.values(peers)
           .filter(p => !p.added)
           .map(p => (
