@@ -7,7 +7,9 @@ export const App = () => {
   const [peers, setPeers] = useState<PeerMap>(allPeers)
 
   const setAdded = (v: boolean) => (id: string) => {
-    if (id && id.length) setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
+    if (id && id.length) {
+      setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
+    }
   }
 
   return (
