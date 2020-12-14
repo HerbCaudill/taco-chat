@@ -8,10 +8,10 @@ export const Chooser = ({ onAdd, peers }: ChooserProps) => {
   const onChange = () => onAdd(peerSelect.current.value)
 
   return (
-    <div className="group">
+    <div className="group flex-grow">
       <Select
         ref={peerSelect}
-        className="opacity-25 group-hover:opacity-100 h-10 font-normal text-lg"
+        className="opacity-25 w-64 group-hover:opacity-100 h-10 font-normal text-lg"
         onChange={onChange}
       >
         <option>Add...</option>
