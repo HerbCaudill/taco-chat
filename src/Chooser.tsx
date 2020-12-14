@@ -5,10 +5,6 @@ import { PeerMap } from './peers'
 export const Chooser = ({ onAdd, peers }: ChooserProps) => {
   const peerSelect = useRef() as React.MutableRefObject<HTMLSelectElement>
 
-  const onClickAdd = () => onAdd(peerSelect.current.value)
-
-  console.log(peers)
-
   return (
     <div className="px-3 flex">
       <div className="w-64 flex-grow mr-3 ">
@@ -22,7 +18,10 @@ export const Chooser = ({ onAdd, peers }: ChooserProps) => {
             ))}
         </Select>
       </div>
-      <Button className="w-full flex-0 block text-lg h-10" onClick={onClickAdd}>
+      <Button
+        className="w-full flex-0 block text-lg h-10"
+        onClick={() => onAdd(peerSelect.current.value)}
+      >
         Add
       </Button>
     </div>
