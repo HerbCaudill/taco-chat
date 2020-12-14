@@ -6,11 +6,8 @@ import { peers as allPeers, PeerMap } from './peers'
 export const App = () => {
   const [peers, setPeers] = useState<PeerMap>(allPeers)
 
-  const setAdded = (v: boolean) => (id: string) => {
-    if (id && id.length) {
-      setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
-    }
-  }
+  const setAdded = (v: boolean) => (id: string) =>
+    setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
 
   return (
     <div className="flex p-3 gap-3" style={{ minWidth: 2400 }}>
