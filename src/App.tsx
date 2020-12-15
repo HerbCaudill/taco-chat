@@ -3,6 +3,7 @@ import { Chooser } from './Chooser'
 import { Peer } from './Peer'
 import { peers as allPeers, PeerMap } from './peers'
 
+// 👩🏾💻 Add Alice's laptop by default
 allPeers['Alice:laptop'].added = true
 
 export const App = () => {

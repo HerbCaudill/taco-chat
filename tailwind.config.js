@@ -36,8 +36,9 @@ module.exports = windmill({
     },
   },
   variants: {
-    opacity: ({ after }) => after(['group-hover']),
-    textColor: ({ after }) => after(['group-hover']),
+    opacity: ({ after }) => after(['group-hover', 'group-focus']),
+    textColor: ({ after }) => after(['group-hover', 'group-focus']),
+    boxShadow: ({ after }) => after(['group-hover', 'group-focus']),
   },
   future: {
     removeDeprecatedGapUtilities: true,
