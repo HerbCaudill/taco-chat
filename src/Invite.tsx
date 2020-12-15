@@ -94,6 +94,9 @@ export const Invite: React.FC = () => {
   }
 }
 
-// TODO add "copy" button using clipboard.js or something https://clipboardjs.com
-// TODO wire up connection
-// TODO style invited members who haven't joined yet
+/*
+- [ ] add "copy" button using clipboard.js or something https://clipboardjs.com
+- [ ] wire up connection
+- [ ] style invited members who haven't joined yet
+- [ ] wire up join
+*/
