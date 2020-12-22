@@ -1,6 +1,6 @@
 import { Select } from '@windmill/react-ui'
 import { useRef } from 'react'
-import { PeerMap } from './peers'
+import { PeerMap } from '../peers'
 
 export const Chooser = ({ onAdd, peers }: ChooserProps) => {
   const peerSelect = useRef() as React.MutableRefObject<HTMLSelectElement>

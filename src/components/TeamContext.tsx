@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as taco from 'taco-js'
+import * as taco from '@localfirst/auth'
 
 const TeamContext = React.createContext<TeamContextPayload>(undefined)
 

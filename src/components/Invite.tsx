@@ -2,8 +2,8 @@ import { objects } from 'friendly-words'
 import { Button, Select } from '@windmill/react-ui'
 import React, { useRef, useState } from 'react'
 import { useTeam } from './TeamContext'
-import { UserInfo, users } from './users'
-import { randomElement } from './randomElement'
+import { UserInfo, users } from '../users'
+import { randomElement } from '../util/randomElement'
 
 export const Invite: React.FC = () => {
   const { team } = useTeam()
@@ -95,8 +95,8 @@ export const Invite: React.FC = () => {
 }
 
 /*
-- [ ] add "copy" button using clipboard.js or something https://clipboardjs.com
 - [ ] wire up connection
-- [ ] style invited members who haven't joined yet
 - [ ] wire up join
+- [ ] add "copy" button using clipboard.js or something https://clipboardjs.com
+- [ ] style invited members who haven't joined yet
 */

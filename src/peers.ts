@@ -1,4 +1,4 @@
-﻿import { arrayToMap } from './arrayToMap'
+﻿import { arrayToMap } from './util/arrayToMap'
 import { DeviceInfo, devices as deviceMap } from './devices'
 import { UserInfo, users as userMap } from './users'
 

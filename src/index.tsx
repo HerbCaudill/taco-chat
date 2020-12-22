@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { App } from './App'
+import { App } from './components/App'
 import { Windmill } from '@windmill/react-ui'
 import { theme } from './theme'
 
