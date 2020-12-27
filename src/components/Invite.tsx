@@ -1,20 +1,43 @@
-import { objects } from 'friendly-words'
+import ClipboardJS from 'clipboard'
 import { Button, Select } from '@windmill/react-ui'
-import React, { useRef, useState } from 'react'
-import { useTeam } from './TeamContext'
 import { UserInfo, users } from '../users'
-import { randomElement } from '../util/randomElement'
+import { useTeam } from './TeamContext'
 
-export const Invite: React.FC = () => {
-  const { team } = useTeam()
-  const select = useRef() as React.MutableRefObject<HTMLSelectElement>
-  type State = 'inactive' | 'collectingInformation' | 'done'
+import { FC, useRef, useState, useEffect } from 'react'
+
+/*
+TODO implement different levels of invitation security
+
+From most secure to least secure:
+
+- named invitation with unique secret code
+
+- named invitation with shared secret code
+
+- anyone who has shared secret code can join
+- named invitation, no secret code
+
+- anyone who knows team name can join
+
+*/
+export const Invite: FC = () => {
+  type State = 'inactive' | 'requestingName' | 'done'
+
   const [state, setState] = useState<State>('inactive')
   const [seed, setSeed] = useState<string>()
   const [userName, setUserName] = useState<string>()
 
+  const { team } = useTeam()
+
+  const select = useRef() as React.MutableRefObject<HTMLSelectElement>
+  const copyInvitationSeed = useRef() as React.MutableRefObject<HTMLButtonElement>
+
+  useEffect(() => {
+    if (copyInvitationSeed && seed) new ClipboardJS(copyInvitationSeed.current)
+  }, [copyInvitationSeed, seed])
+
   const activate = () => {
-    setState('collectingInformation')
+    setState('requestingName')
   }
 
   const done = () => {
@@ -25,11 +48,11 @@ export const Invite: React.FC = () => {
     const userName = select.current.value
     setUserName(userName)
 
-    const randomSeed = team.teamName + '-' + [objects, objects].map(randomElement).join('-')
-    setSeed(randomSeed)
+    const invitationSeed = `${team.teamName}-${randomSeed()}`
+    setSeed(invitationSeed)
 
     // TODO store id so we can revoke the invitation
-    const { id } = team.invite(userName, { invitationSeed: randomSeed })
+    const { id } = team.invite(userName, { invitationSeed })
 
     setState('done')
   }
@@ -41,12 +64,15 @@ export const Invite: React.FC = () => {
           <Button size="small" className="my-2 mr-2" onClick={activate}>
             Invite someone
           </Button>
+
+          {/* TODO: add a device */}
           <Button size="small" className="my-2 mr-2">
             Add a device
           </Button>
         </div>
       )
-    case 'collectingInformation':
+
+    case 'requestingName':
       const isMember = (user: UserInfo) =>
         team
           .members()
@@ -58,7 +84,9 @@ export const Invite: React.FC = () => {
       return (
         <>
           <p>Who do you want to invite?</p>
+
           <div className="flex gap-2">
+            {/* Dropdown with names & emoji */}
             <Select ref={select} className="mt-1 w-full">
               {nonMembers.map(u => (
                 <option key={u.name} value={u.name}>
@@ -66,10 +94,12 @@ export const Invite: React.FC = () => {
                 </option>
               ))}
             </Select>
+
             <Button className="mt-1 w-full" onClick={invite}>
               Invite
             </Button>
           </div>
+
           <Button size="small" layout="outline" className="mt-1" onClick={done}>
             Cancel
           </Button>
@@ -81,12 +111,15 @@ export const Invite: React.FC = () => {
         <>
           <p className="my-2 font-bold">Here's the invite!</p>
           <p className="my-2">Copy this code and send it to {userName}:</p>
-          <pre className="my-2 border border-gray-200 rounded-md p-3 bg-gray-100 text-xs whitespace-pre-wrap">
-            {seed}
-          </pre>
-          <div className="text-right">
-            <Button className="mt-1" onClick={done}>
-              OK
+          <pre
+            className="my-2 p-3 
+              border border-gray-200 rounded-md bg-gray-100 
+              text-xs whitespace-pre-wrap"
+            children={seed}
+          />
+          <div className="mt-1 text-right">
+            <Button ref={copyInvitationSeed} onClick={done} data-clipboard-text={seed}>
+              Copy
             </Button>
           </div>
         </>
@@ -95,8 +128,8 @@ export const Invite: React.FC = () => {
 }
 
 /*
-- [ ] wire up connection
-- [ ] wire up join
 - [ ] add "copy" button using clipboard.js or something https://clipboardjs.com
 - [ ] style invited members who haven't joined yet
 */
+
+const randomSeed = () => '0000'.replace(/0/g, () => Math.floor(Math.random() * 10).toString())
