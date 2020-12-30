@@ -1,5 +1,5 @@
 import * as auth from '@localfirst/auth'
-import { CardBody } from '@windmill/react-ui'
+import { Button, CardBody } from '@windmill/react-ui'
 import { Fragment, FC, useEffect, useState } from 'react'
 import { ConnectionManager } from '../ConnectionManager'
 import { users } from '../users'
@@ -19,6 +19,10 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
     }
   }, [team])
 
+  // TODO: don't allow removing the last admin
+
+  const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
+
   return (
     <TeamProvider value={team}>
       <CardBody>
@@ -31,11 +35,33 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
           <tbody>
             {/* One row per member */}
             {members?.map(m => {
+              const isAdmin = team.memberIsAdmin(m.userName)
               return (
                 <Fragment key={m.userName}>
                   <tr className="border-t border-b group ">
                     {/* Admin icon, if admin */}
-                    <td>{team.memberIsAdmin(m.userName) ? '👑' : ''}</td>
+                    <td className="w-2">
+                      <Button
+                        disabled={isAdmin && adminCount() === 1}
+                        layout="link"
+                        size="small"
+                        onClick={() => {
+                          if (isAdmin) team.removeMemberRole(m.userName, auth.ADMIN)
+                          else team.addMemberRole(m.userName, auth.ADMIN)
+                        }}
+                        title={
+                          isAdmin
+                            ? adminCount() === 1
+                              ? `Can't remove the only admin`
+                              : 'Team admin (click to remove)'
+                            : 'Click to make team admin'
+                        }
+                        className={`px-1 m-1 hover:opacity-25 ${
+                          isAdmin ? 'opacity-100' : 'opacity-0 '
+                        }`}
+                        children="👑"
+                      />
+                    </td>
 
                     {/* Name & emoji */}
                     <td className="p-2">
