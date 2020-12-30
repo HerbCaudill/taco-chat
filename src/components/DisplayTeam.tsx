@@ -19,8 +19,6 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
     }
   }, [team])
 
-  // TODO: don't allow removing the last admin
-
   const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
 
   return (
@@ -42,9 +40,9 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
                     {/* Admin icon, if admin */}
                     <td className="w-2">
                       <Button
-                        disabled={isAdmin && adminCount() === 1}
                         layout="link"
                         size="small"
+                        disabled={isAdmin && adminCount() === 1}
                         onClick={() => {
                           if (isAdmin) team.removeMemberRole(m.userName, auth.ADMIN)
                           else team.addMemberRole(m.userName, auth.ADMIN)
