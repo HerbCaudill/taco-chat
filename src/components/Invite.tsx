@@ -33,7 +33,7 @@ export const Invite: FC = () => {
   const copyInvitationSeed = useRef() as React.MutableRefObject<HTMLButtonElement>
 
   useEffect(() => {
-    if (copyInvitationSeed && seed) new ClipboardJS(copyInvitationSeed.current)
+    if (copyInvitationSeed?.current && seed) new ClipboardJS(copyInvitationSeed.current)
   }, [copyInvitationSeed, seed])
 
   const activate = () => {
@@ -127,9 +127,6 @@ export const Invite: FC = () => {
   }
 }
 
-/*
-- [ ] add "copy" button using clipboard.js or something https://clipboardjs.com
-- [ ] style invited members who haven't joined yet
-*/
+// TODO: style invited members who haven't joined yet
 
 const randomSeed = () => '0000'.replace(/0/g, () => Math.floor(Math.random() * 10).toString())

@@ -3,29 +3,38 @@ import { Client } from '@localfirst/relay-client'
 import { EventEmitter } from 'events'
 import { Connection } from './Connection'
 
-// TODO this probably belongs in the relay package - this would be the client we import
+// TODO this probably belongs in the relay package - this would be the client we import?
+
 /**
  * Wraps a Client and creates a Connection instance for each peer we connect to.
  */
 export class ConnectionManager extends EventEmitter {
   private client: Client
-  private connections: { [peerId: string]: Connection } = {}
+  private connections: Record<string, Connection> = {}
 
   constructor({ teamName, urls, context }: ConnectionManagerOptions) {
     super()
-    this.client = new Client({ id: context.user.userName, url: urls[0] })
 
+    // connect to relay server
+    this.client = new Client({ id: context.user.userName, url: urls[0] })
     this.client.join(teamName)
 
-    this.client.on('peer', ({ key, id, socket }) => {
-      const connection = new Connection(socket, context)
-      this.connections[id] = connection
-      connection.on('connected', () => this.emit('peer', connection))
-      connection.on('disconnected', () => this.removePeer(id))
+    this.client.on('close', () => {
+      // disconnected from relay server
+      this.emit('close')
     })
 
-    this.client.on('open', () => this.emit('open'))
-    this.client.on('close', () => this.emit('close'))
+    this.client.on('peer', ({ id, socket }) => {
+      // connected to a new peer
+      const connection = new Connection(socket, context)
+      this.connections[id] = connection
+
+      connection.on('connected', () => this.emit('connected', connection))
+      connection.on('disconnected', event => {
+        this.emit('disconnected', event)
+        this.removePeer(id)
+      })
+    })
   }
 
   private removePeer = (peerId: string) => {

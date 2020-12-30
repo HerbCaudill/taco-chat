@@ -149,7 +149,7 @@
       larger: 'px-10 py-4 rounded-lg',
       large: 'px-5 py-3 rounded-lg',
       regular: 'px-3 py-1 rounded-md text-sm',
-      small: 'px-2 py-1 rounded-sm text-xs',
+      small: 'px-2 py-1 rounded-md text-xs',
       icon: {
         larger: 'p-4 rounded-lg',
         large: 'p-3 rounded-lg',

@@ -16,11 +16,9 @@ export class Connection extends Duplex {
     this._read = () => {}
     this._write = () => {}
 
-    // NEXT: on 'joined' or 'connected' we need to update the team in context
-
     authConnection.on('connected', () => this.emit('connected'))
     authConnection.on('joined', () => this.emit('joined'))
-    authConnection.on('disconnected', () => this.emit('disconnected'))
+    authConnection.on('disconnected', event => this.emit('disconnected', event))
 
     this.authConnection = authConnection
   }
