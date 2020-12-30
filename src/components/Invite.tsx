@@ -18,7 +18,7 @@ From most secure to least secure:
 - named invitation, no secret code
 
 - anyone who knows team name can join
-
+nnec
 */
 export const Invite: FC = () => {
   type State = 'inactive' | 'requestingName' | 'done'

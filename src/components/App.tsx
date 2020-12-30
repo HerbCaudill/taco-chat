@@ -17,7 +17,7 @@ export const App = () => {
       {Object.values(peers)
         .filter(p => p.added)
         .map(p => (
-          <Peer key={p.id} onRemove={setAdded(false)} {...p}></Peer>
+          <Peer key={p.id} onRemove={setAdded(false)} peer={p}></Peer>
         ))}
       <Chooser onAdd={setAdded(true)} peers={peers}></Chooser>
     </div>

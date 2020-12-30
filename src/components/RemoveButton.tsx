@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const RemoveButton = ({ onClick }: RemoveButtonProps) => (
   <div className="opacity-0 group-hover:opacity-100">
     <button

@@ -1,7 +1,9 @@
-﻿import { Client, newid, Peer } from '@localfirst/relay-client'
+﻿import * as auth from '@localfirst/auth'
+import { Client } from '@localfirst/relay-client'
 import { EventEmitter } from 'events'
 import { Connection } from './Connection'
 
+// TODO this probably belongs in the relay package - this would be the client we import
 /**
  * Wraps a Client and creates a Connection instance for each peer we connect to.
  */
@@ -9,27 +11,25 @@ export class ConnectionManager extends EventEmitter {
   private client: Client
   private connections: { [peerId: string]: Connection } = {}
 
-  constructor({ discoveryKey, urls, clientId = newid() }: ConnectionManagerOptions) {
+  constructor({ teamName, urls, context }: ConnectionManagerOptions) {
     super()
+    this.client = new Client({ id: context.user.userName, url: urls[0] })
 
-    // TODO: randomly select a URL if more than one is provided? select best based on ping?
-    this.client = new Client({ id: clientId, url: urls[0] })
+    this.client.join(teamName)
 
-    this.client.join(discoveryKey)
-    this.client.on('peer', this.addPeer)
+    this.client.on('peer', ({ key, id, socket }) => {
+      const connection = new Connection(socket, context)
+      this.connections[id] = connection
+      connection.on('connected', () => this.emit('peer', connection))
+      connection.on('disconnected', () => this.removePeer(id))
+    })
+
     this.client.on('open', () => this.emit('open'))
     this.client.on('close', () => this.emit('close'))
   }
 
-  private addPeer = (peer: Peer, discoveryKey: string) => {
-    const socket = peer.get(discoveryKey)
-
-    peer.on('close', () => this.removePeer(peer.id))
-    this.emit('peer', Object.keys(this.connections))
-  }
-
   private removePeer = (peerId: string) => {
-    if (this.connections[peerId]) this.connections[peerId].close()
+    if (this.connections[peerId]) this.connections[peerId].end()
     delete this.connections[peerId]
     this.emit('peer_remove', Object.keys(this.connections))
   }
@@ -46,7 +46,7 @@ export class ConnectionManager extends EventEmitter {
 }
 
 interface ConnectionManagerOptions {
-  discoveryKey: string
+  teamName: string
   urls: string[]
-  clientId?: string
+  context: auth.InitialContext
 }

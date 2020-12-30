@@ -7,7 +7,7 @@
     "build:css": "postcss src/index.postcss -o public/index.css",
     "prebuild": "yarn build:css",
     "build": "react-scripts build",
-    "dev": "run-p watch start:relay start",
+    "dev": "cross-env DEBUG='lf*' DEBUG_COLORS=1  run-p watch start:relay start",
     "start": "react-scripts start",
     "start:relay": "node ./scripts/start-relay-server.js",
     "test": "react-scripts test",
@@ -22,13 +22,16 @@
     "@testing-library/react": "11",
     "@testing-library/user-event": "12",
     "@types/classnames": "2",
+    "@types/clipboard": "2",
     "@types/jest": "26",
     "@types/node": "12",
-    "@types/react": "16",
-    "@types/react-dom": "16",
+    "@types/react": "17",
+    "@types/react-dom": "17",
     "@windmill/react-ui": "0",
     "autoprefixer": "9",
     "classnames": "2",
+    "clipboard": "2",
+    "cross-env": "7",
     "friendly-words": "1",
     "nodemon": "2",
     "npm-run-all": "4",
@@ -38,7 +41,8 @@
     "react-dom": "17",
     "react-scripts": "4",
     "tailwindcss": "1",
-    "typescript": "4"
+    "typescript": "4",
+    "websocket-stream": "5"
   },
   "prettier": {
     "printWidth": 100,
@@ -47,7 +51,7 @@
     "trailingComma": "es5",
     "arrowParens": "avoid"
   },
-  "nodemon": {
+  "nodemonConfig": {
     "watch": [
       "postcss.config.js",
       "tailwind.config.js",

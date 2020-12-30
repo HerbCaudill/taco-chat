@@ -1,36 +1,31 @@
+import * as auth from '@localfirst/auth'
 import { Duplex } from 'stream'
+import { WebSocketDuplex } from 'websocket-stream'
 
-/**
- * A `Connection` keeps one local document synchronized with one peer's replica of the same
- * document. It uses `Synchronizer` for the synchronization logic, and integrates it with our
- * networking stack and with the Redux store.
- */
 export class Connection extends Duplex {
-  private peerSocket: WebSocket | null
+  authConnection: auth.Connection
 
-  constructor(peerSocket: WebSocket) {
+  constructor(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
     super()
-    this.peerSocket = peerSocket
+    const authConnection = new auth.Connection(context).start()
 
-    this.peerSocket.onmessage = async ({ data }: any) => {
-      const message = JSON.parse(data.toString())
-      this.emit('receive', message)
-    }
+    // this Connection <-> authConnection <-> peerSocket
+    this.pipe(authConnection).pipe(this)
+    authConnection.pipe(peerSocket).pipe(authConnection)
+
+    this._read = () => {}
+    this._write = () => {}
+
+    // NEXT: on 'joined' or 'connected' we need to update the team in context
+
+    authConnection.on('connected', () => this.emit('connected'))
+    authConnection.on('joined', () => this.emit('joined'))
+    authConnection.on('disconnected', () => this.emit('disconnected'))
+
+    this.authConnection = authConnection
   }
 
-  public write = (message: any) => {
-    if (this.peerSocket)
-      try {
-        this.peerSocket.send(JSON.stringify(message))
-      } catch (err) {
-        return false
-      }
-    return true
-  }
-
-  public close = () => {
-    if (!this.peerSocket) return
-    this.peerSocket.close()
-    this.peerSocket = null
+  get team() {
+    return this.authConnection.team
   }
 }
