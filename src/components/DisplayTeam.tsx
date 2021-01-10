@@ -1,4 +1,6 @@
+import Mermaid from 'react-mermaid2'
 import * as auth from '@localfirst/auth'
+import { TeamSignatureChain } from '@localfirst/auth/dist/chain'
 import { Button, CardBody } from '@windmill/react-ui'
 import { Fragment, FC, useEffect, useState } from 'react'
 import { ConnectionManager } from '../ConnectionManager'
@@ -8,7 +10,7 @@ import { ConnectionToggle } from './ConnectionToggle'
 import { Invite } from './Invite'
 import { TeamProvider } from './TeamContext'
 
-export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
+export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
   const [members, setMembers] = useState(team?.members())
 
   useEffect(() => {
@@ -98,7 +100,11 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team }) => {
         </table>
 
         {/* Invitation UI */}
-        <Invite />
+        {team.memberIsAdmin(user.userName) ? <Invite /> : null}
+      </CardBody>
+      <CardBody className="border-t">
+        <CardLabel>Signature chain</CardLabel>
+        {visualizeChain(team.chain)}
       </CardBody>
     </TeamProvider>
   )
@@ -107,4 +113,21 @@ interface PeerWithTeamProps {
   team: auth.Team
   user: auth.User
   connectionManager: ConnectionManager
+}
+
+export const visualizeChain = (chain: TeamSignatureChain) => {
+  return (
+    <Mermaid
+      chart={`
+      graph TD
+        A(ROOT<br>party-planners)-->B("INVITE<br/>👨🏻‍🦲<br/>admin")
+        B--> C("INVITE<br/>👴")
+        B--> D(ADD ROLE<br/>managers)
+        C --> E{"M"}
+        D --> E
+        E --> F("INVITE<br/>👳🏽‍♂️<br/>managers")
+    `}
+    />
+  )
+  // return <pre className="text-xs">{JSON.stringify(chain, null, 2)}</pre>
 }

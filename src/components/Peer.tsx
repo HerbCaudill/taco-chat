@@ -10,6 +10,7 @@ import { AlertInfo, Alerts } from './Alerts'
 import { Avatar } from './Avatar'
 import { CreateOrJoinTeam } from './CreateOrJoinTeam'
 import { DisplayTeam } from './DisplayTeam'
+import { ErrorBoundary } from './ErrorBoundary'
 import { RemoveButton } from './RemoveButton'
 
 // TODO: make this an environment var
@@ -76,25 +77,27 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
 
   // TODO: can't have nested tailwindcss groups, so need to do custom css for group-hover
   return (
-    <Card className="group max-w-sm flex-1 bg-white shadow-md relative">
-      <RemoveButton onClick={() => onRemove(peer.id)}></RemoveButton>
+    <ErrorBoundary>
+      <Card className="group max-w-sm flex-1 bg-white shadow-md relative">
+        <RemoveButton onClick={() => onRemove(peer.id)}></RemoveButton>
 
-      <CardBody className="flex items-center bg-teal-500">
-        <Avatar size="lg" className="bg-opacity-75">
-          {peer.user.emoji}
-        </Avatar>
-        <h1 className="text-white text-2xl font-extrabold flex-grow">{peer.user.name}</h1>
-        <Avatar size="sm">{peer.device.emoji}</Avatar>
-      </CardBody>
+        <CardBody className="flex items-center bg-teal-500">
+          <Avatar size="lg" className="bg-opacity-75">
+            {peer.user.emoji}
+          </Avatar>
+          <h1 className="text-white text-2xl font-extrabold flex-grow">{peer.user.name}</h1>
+          <Avatar size="sm">{peer.device.emoji}</Avatar>
+        </CardBody>
 
-      <Alerts alerts={alerts} clearAlert={clearAlert} />
+        <Alerts alerts={alerts} clearAlert={clearAlert} />
 
-      {team ? (
-        <DisplayTeam user={user} team={team} connectionManager={connectionManager!} />
-      ) : (
-        <CreateOrJoinTeam user={user} createTeam={createTeam} joinTeam={joinTeam} />
-      )}
-    </Card>
+        {team ? (
+          <DisplayTeam user={user} team={team} connectionManager={connectionManager!} />
+        ) : (
+          <CreateOrJoinTeam user={user} createTeam={createTeam} joinTeam={joinTeam} />
+        )}
+      </Card>
+    </ErrorBoundary>
   )
 }
 
