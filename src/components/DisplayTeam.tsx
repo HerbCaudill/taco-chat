@@ -7,7 +7,7 @@ import { CardLabel } from './CardLabel'
 import { ConnectionToggle } from './ConnectionToggle'
 import { Invite } from './Invite'
 import { TeamProvider } from './TeamContext'
-import { visualizeChain } from './visualizeChain'
+import { ChainDiagram } from './ChainDiagram'
 
 export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
   const [members, setMembers] = useState(team?.members())
@@ -101,9 +101,11 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
         {/* Invitation UI */}
         {team.memberIsAdmin(user.userName) ? <Invite /> : null}
       </CardBody>
+
+      {/* Chain visualization */}
       <CardBody className="border-t">
         <CardLabel>Signature chain</CardLabel>
-        {visualizeChain(team.chain)}
+        <ChainDiagram chain={team.chain} />
       </CardBody>
     </TeamProvider>
   )

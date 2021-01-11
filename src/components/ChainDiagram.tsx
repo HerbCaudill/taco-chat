@@ -1,11 +1,12 @@
 import { isMergeLink, isRootLink, TeamLink, TeamSignatureChain } from '@localfirst/auth'
-import Mermaid from 'react-mermaid2'
+import { FC } from 'react'
 import { theme } from '../mermaid.theme'
 import { users } from '../users'
+import { Mermaid } from './Mermaid'
 
 const LINE_BREAK = '\n'
 
-export const visualizeChain = (chain: TeamSignatureChain) => {
+export const ChainDiagram: FC<{ chain: TeamSignatureChain }> = ({ chain }) => {
   const chartHeader = [
     `graph TD`,
     `classDef merge fill:#fc3,font-weight:bold,stroke-width:3px,text-align:center`,
@@ -13,7 +14,7 @@ export const visualizeChain = (chain: TeamSignatureChain) => {
 
   const chartNodes = Object.keys(chain.links).map(hash => {
     const link = chain.links[hash]
-    const id = idFromHash(hash)
+    const id = getId(hash)
     return `${id}${mermaidNodeFromLink(link)}`
   })
 
@@ -30,7 +31,6 @@ export const visualizeChain = (chain: TeamSignatureChain) => {
       <div>
         <Mermaid config={theme} chart={chart} />
       </div>
-      <pre className="text-xs">{JSON.stringify(chain, null, 2)}</pre>
     </div>
   )
 }
@@ -44,7 +44,7 @@ const replaceNamesWithEmoji = (s: string) => {
   return s
 }
 
-const idFromHash = (s: string) => s.replace(/^[A-Za-z0-9]/g, '').slice(0, 5)
+const getId = (s: string) => s.replace(/^[A-Za-z0-9]/g, '').slice(0, 5)
 
 const mermaidNodeFromLink = (link: TeamLink) => {
   if (isMergeLink(link)) {
@@ -61,8 +61,8 @@ const mermaidEdgeFromLink = (link: TeamLink) => {
   if (isRootLink(link)) {
     return ''
   } else if (isMergeLink(link)) {
-    return link.body.map(hash => `${idFromHash(hash)} --> ${idFromHash(link.hash)}`)
+    return link.body.map(hash => `${getId(hash)} --> ${getId(link.hash)}`)
   } else {
-    return `${idFromHash(link.body.prev)} --> ${idFromHash(link.hash)}`
+    return `${getId(link.body.prev)} --> ${getId(link.hash)}`
   }
 }
