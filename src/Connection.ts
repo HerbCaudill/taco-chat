@@ -1,20 +1,26 @@
 import * as auth from '@localfirst/auth'
 import { Duplex } from 'stream'
 import { WebSocketDuplex } from 'websocket-stream'
+import debug from 'debug'
+const log = debug('lf:tc:connection')
 
 export class Connection extends Duplex {
   authConnection: auth.Connection
 
   constructor(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
     super()
-    const authConnection = new auth.Connection(context).start()
-
-    // this Connection <-> authConnection <-> peerSocket
-    this.pipe(authConnection).pipe(this)
-    authConnection.pipe(peerSocket).pipe(authConnection)
 
     this._read = () => {}
     this._write = () => {}
+
+    const authConnection = new auth.Connection(context)
+    authConnection.start()
+
+    // this <-> authConnection <-> peerSocket
+    log({ peerSocket, authConnection })
+
+    this.pipe(authConnection).pipe(this)
+    authConnection.pipe(peerSocket).pipe(authConnection)
 
     authConnection.on('connected', () => this.emit('connected'))
     authConnection.on('joined', () => this.emit('joined'))

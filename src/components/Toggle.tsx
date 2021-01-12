@@ -7,7 +7,8 @@ export const Toggle: React.FC<ToggleProps> = ({ on, disabled = false, onClick }:
       role="checkbox"
       aria-checked={on}
       aria-disabled={disabled}
-      className={`group relative inline-flex items-center justify-center 
+      className={`Toggle
+        group relative inline-flex items-center justify-center 
         opacity-${disabled ? 50 : 100}      
         flex-shrink-0 h-4 w-6 cursor-pointer focus:outline-none`}
       onClick={disabled ? noOp : onClick}

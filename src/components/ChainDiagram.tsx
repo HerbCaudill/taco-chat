@@ -27,10 +27,8 @@ export const ChainDiagram: FC<{ chain: TeamSignatureChain }> = ({ chain }) => {
 
   const chart = chartLines.join(LINE_BREAK)
   return (
-    <div>
-      <div>
-        <Mermaid config={theme} chart={chart} />
-      </div>
+    <div className="ChainDiagram">
+      <Mermaid config={theme} chart={chart} />
     </div>
   )
 }

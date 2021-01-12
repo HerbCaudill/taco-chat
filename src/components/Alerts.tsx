@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 export const Alerts: React.FC<AlertsProps> = ({ alerts, clearAlert }) => {
   return alerts.length ? (
-    <div className="p-2">
+    <div className="Alerts p-2">
       {alerts.map(a => (
         <div key={a.id} className="relative rounded-md bg-gray-100 p-3 pr-12 ">
           <button

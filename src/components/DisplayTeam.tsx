@@ -24,7 +24,7 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
 
   return (
     <TeamProvider value={team}>
-      <CardBody>
+      <CardBody className="DisplayTeam">
         {/* Team name */}
         <CardLabel>Team</CardLabel>
         <p>{team.teamName}</p>

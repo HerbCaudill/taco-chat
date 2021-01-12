@@ -13,7 +13,7 @@ export const App = () => {
     setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
 
   return (
-    <div className="flex p-3 gap-3" style={{ minWidth: 2400 }}>
+    <div className="App flex p-3 gap-3" style={{ minWidth: 2400 }}>
       {Object.values(peers)
         .filter(p => p.added)
         .map(p => (

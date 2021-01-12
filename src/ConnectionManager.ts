@@ -2,8 +2,11 @@
 import { Client } from '@localfirst/relay-client'
 import { EventEmitter } from 'events'
 import { Connection } from './Connection'
+import debug from 'debug'
 
 // TODO this probably belongs in the relay package - this would be the client we import?
+
+const log = debug('lf:tc:connectionmanager')
 
 /**
  * Wraps a Client and creates a Connection instance for each peer we connect to.
@@ -25,15 +28,21 @@ export class ConnectionManager extends EventEmitter {
     })
 
     this.client.on('peer', ({ id, socket }) => {
-      // connected to a new peer
-      const connection = new Connection(socket, context)
-      this.connections[id] = connection
+      // const { id, socket } = args
+      // const { id } = socket
+      if (socket) {
+        // connected to a new peer
+        const connection = new Connection(socket, context)
+        this.connections[id] = connection
 
-      connection.on('connected', () => this.emit('connected', connection))
-      connection.on('disconnected', event => {
-        this.emit('disconnected', event)
-        this.removePeer(id)
-      })
+        connection.on('connected', () => this.emit('connected', connection))
+        connection.on('disconnected', event => {
+          this.emit('disconnected', event)
+          this.removePeer(id)
+        })
+      } else {
+        log('no socket')
+      }
     })
   }
 

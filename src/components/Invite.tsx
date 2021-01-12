@@ -60,7 +60,7 @@ export const Invite: FC = () => {
   switch (state) {
     case 'inactive':
       return (
-        <div className="flex gap-2">
+        <div className="Invite flex gap-2">
           <Button size="small" className="my-2 mr-2" onClick={activate}>
             Invite someone
           </Button>
@@ -87,7 +87,7 @@ export const Invite: FC = () => {
 
           <div className="flex gap-2">
             {/* Dropdown with names & emoji */}
-            <Select ref={select} className="mt-1 w-full">
+            <Select ref={select} className="InviteWho mt-1 w-full">
               {nonMembers.map(u => (
                 <option key={u.name} value={u.name}>
                   {u.emoji} {u.name}
@@ -95,12 +95,12 @@ export const Invite: FC = () => {
               ))}
             </Select>
 
-            <Button className="mt-1 w-full" onClick={invite}>
+            <Button className="InviteButton mt-1 w-full" onClick={invite}>
               Invite
             </Button>
           </div>
 
-          <Button size="small" layout="outline" className="mt-1" onClick={done}>
+          <Button size="small" layout="outline" className="CancelButton mt-1" onClick={done}>
             Cancel
           </Button>
         </>

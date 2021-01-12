@@ -8,7 +8,8 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(function Ava
     md: 'w-10 h-10 text-lg',
     sm: 'w-8 h-8 text-md',
   }
-  const baseStyle = 'rounded-full border border-white bg-white bg-opacity-50 mr-3 flex items-center'
+  const baseStyle =
+    'Avatar rounded-full border border-white bg-white bg-opacity-50 mr-3 flex items-center'
   const cls = classNames(baseStyle, sizeStyles[size], className)
   return (
     <div className={cls}>

@@ -1,5 +1,5 @@
 export const RemoveButton = ({ onClick }: RemoveButtonProps) => (
-  <div className="opacity-0 group-hover:opacity-100">
+  <div className="RemoveButton opacity-0 group-hover:opacity-100">
     <button
       className="absolute top-0 right-0 p-1 m-2 leading-none opacity-25 rounded-full 
         text-white text-xs

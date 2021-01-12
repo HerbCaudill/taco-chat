@@ -18,7 +18,7 @@ export const CreateOrJoinTeam: React.FC<PeerWithoutTeamProps> = ({
   switch (state) {
     case 'inactive':
       return (
-        <div className="flex">
+        <div className="CreateOrJoinTeam flex">
           <CardBody className="border-r">
             <p>Starting something new?</p>
             <p className="py-2">
