@@ -11,7 +11,7 @@
     "start": "react-scripts start",
     "start:relay": "node ./scripts/start-relay-server.js",
     "test": "react-scripts test",
-    "test:cy": "cypress run --browser chrome --spec cypress/integration/basic.ts --no-exit --env debug=lf*",
+    "test:cy": "cypress open",
     "dev:cy": "run-p dev test:cy",
     "watch": "nodemon -x yarn build:css"
   },
@@ -38,6 +38,7 @@
     "cross-env": "7",
     "cuid": "2",
     "cypress": "^6.2.1",
+    "cypress-promise": "^1.1.0",
     "debug": "^4.3.1",
     "friendly-words": "1",
     "keycode": "^2.2.0",

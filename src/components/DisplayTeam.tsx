@@ -8,6 +8,7 @@ import { ConnectionToggle } from './ConnectionToggle'
 import { Invite } from './Invite'
 import { TeamProvider } from './TeamContext'
 import { ChainDiagram } from './ChainDiagram'
+import { DeviceInfo } from '../devices'
 
 export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
   const [members, setMembers] = useState(team?.members())
@@ -27,10 +28,10 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
       <CardBody className="DisplayTeam">
         {/* Team name */}
         <CardLabel>Team</CardLabel>
-        <p>{team.teamName}</p>
+        <p className="TeamName">{team.teamName}</p>
 
         {/* Members table */}
-        <table className="w-full border-collapse text-sm my-3">
+        <table className="MemberTable w-full border-collapse text-sm my-3">
           <tbody>
             {/* One row per member */}
             {members?.map(m => {
@@ -105,7 +106,7 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
       {/* Chain visualization */}
       <CardBody className="border-t">
         <CardLabel>Signature chain</CardLabel>
-        <ChainDiagram chain={team.chain} />
+        <ChainDiagram chain={team.chain} id={user.userName} />
       </CardBody>
     </TeamProvider>
   )
@@ -113,5 +114,6 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
 interface PeerWithTeamProps {
   team: auth.Team
   user: auth.User
+  device: DeviceInfo
   connectionManager: ConnectionManager
 }

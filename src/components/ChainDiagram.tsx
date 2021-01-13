@@ -1,4 +1,13 @@
-import { isMergeLink, isRootLink, TeamLink, TeamSignatureChain } from '@localfirst/auth'
+import {
+  isMergeLink,
+  isRootLink,
+  LinkBody,
+  RootAction,
+  TeamAction,
+  TeamActionLink,
+  TeamLink,
+  TeamSignatureChain,
+} from '@localfirst/auth'
 import { FC } from 'react'
 import { theme } from '../mermaid.theme'
 import { users } from '../users'
@@ -6,7 +15,7 @@ import { Mermaid } from './Mermaid'
 
 const LINE_BREAK = '\n'
 
-export const ChainDiagram: FC<{ chain: TeamSignatureChain }> = ({ chain }) => {
+export const ChainDiagram: FC<{ chain: TeamSignatureChain; id: string }> = ({ chain, id }) => {
   const chartHeader = [
     `graph TD`,
     `classDef merge fill:#fc3,font-weight:bold,stroke-width:3px,text-align:center`,
@@ -23,12 +32,11 @@ export const ChainDiagram: FC<{ chain: TeamSignatureChain }> = ({ chain }) => {
     return mermaidEdgeFromLink(link)
   })
 
-  const chartLines = chartHeader.concat(chartNodes).concat(chartEdges)
+  const chart = chartHeader.concat(chartNodes).concat(chartEdges).join(LINE_BREAK)
 
-  const chart = chartLines.join(LINE_BREAK)
   return (
     <div className="ChainDiagram">
-      <Mermaid config={theme} chart={chart} />
+      <Mermaid config={theme} chart={chart} id={id} />
     </div>
   )
 }
@@ -51,7 +59,11 @@ const mermaidNodeFromLink = (link: TeamLink) => {
     const author = link.signed.userName
 
     const type = link.body.type
-    return replaceNamesWithEmoji(`("<span class='author'>${author}</span><b>${type}</b><br/> ")`)
+    return replaceNamesWithEmoji(
+      `("<span class='author'>${author}</span><b>${type}</b><br/>${truncateHashes(
+        actionSummary(link.body)
+      )} ")`
+    )
   }
 }
 
@@ -64,3 +76,37 @@ const mermaidEdgeFromLink = (link: TeamLink) => {
     return `${getId(link.body.prev)} --> ${getId(link.hash)}`
   }
 }
+
+const actionSummary = (action: LinkBody<TeamAction>) => {
+  switch (action.type) {
+    case 'ADD_MEMBER':
+      return action.payload.member.userName
+    case 'REMOVE_MEMBER':
+      return action.payload.userName
+    case 'ADD_ROLE':
+      return action.payload.roleName
+    case 'ADD_MEMBER_ROLE':
+      return `${action.payload.userName} ${action.payload.roleName}`
+    case 'REMOVE_MEMBER_ROLE':
+      return `${action.payload.userName} ${action.payload.roleName}`
+    case 'ADD_DEVICE':
+      return action.payload.device.deviceId
+    case 'REMOVE_DEVICE':
+      return action.payload.deviceId
+    case 'INVITE':
+      return action.payload.invitation.id
+    case 'REVOKE_INVITATION':
+      return action.payload.id
+    case 'ADMIT':
+      return `${action.payload.userName} (${action.payload.id})`
+    case 'CHANGE_MEMBER_KEYS':
+    case 'CHANGE_DEVICE_KEYS':
+      return action.payload.keys.name
+    // return '' //JSON.stringify(action.payload.keys)
+    default:
+      return ''
+  }
+}
+
+const truncateHashes = (s: string) => s.replace(hashRx, s => s.slice(0, 5))
+const hashRx = /(?:[A-Za-z0-9+/=]{12,100})?/gm

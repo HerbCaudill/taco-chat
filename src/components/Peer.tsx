@@ -92,7 +92,12 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
         <Alerts alerts={alerts} clearAlert={clearAlert} />
 
         {team ? (
-          <DisplayTeam user={user} team={team} connectionManager={connectionManager!} />
+          <DisplayTeam
+            user={user}
+            device={peer.device}
+            team={team}
+            connectionManager={connectionManager!}
+          />
         ) : (
           <CreateOrJoinTeam user={user} createTeam={createTeam} joinTeam={joinTeam} />
         )}

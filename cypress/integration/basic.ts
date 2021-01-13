@@ -1,7 +1,10 @@
 import '@testing-library/cypress'
 
 describe('taco-chat', () => {
-  beforeEach(() => cy.visit('/'))
+  beforeEach(() => {
+    cy.visit('/')
+    localStorage.setItem('debug', 'lf:*')
+  })
 
   describe('on first load', () => {
     it('has just one peer, which is Alice', () => {
@@ -23,6 +26,9 @@ describe('taco-chat', () => {
   })
 
   describe('add Bob', () => {
+    const alice = () => cy.get('.Peer').eq(0)
+    const bob = () => cy.get('.Peer').eq(1)
+
     beforeEach(() =>
       // select Bob from 'Add...' dropdown
       cy.get('.Chooser select').select('Bob:laptop')
@@ -37,11 +43,21 @@ describe('taco-chat', () => {
         .contains('Bob')
     })
 
-    describe.only('invite Bob', () => {
+    describe('Bob creates another team', () => {
       beforeEach(() => {
-        const alice = () => cy.get('.Peer').eq(0)
-        const bob = () => cy.get('.Peer').eq(1)
+        bob().findByText('Create team').click().get('.TeamName')
+      })
 
+      it('has two different teams', () => {
+        const aliceTeamName = cy.$$('.Peer:eq(0) .TeamName').text()
+        const bobTeamName = cy.$$('.Peer:eq(1) .TeamName').text()
+        // team names are different
+        cy.wrap(aliceTeamName).should('not.equal', bobTeamName)
+      })
+    })
+
+    describe('invite Bob', () => {
+      beforeEach(() => {
         // click invite button
         alice().findByText('Invite someone').click()
 
@@ -60,7 +76,15 @@ describe('taco-chat', () => {
           })
       })
 
-      it('should ', () => {})
+      it('has the same team for both peers', () => {
+        bob().get('.MemberTable').contains('Bob')
+        alice()
+          .get('.TeamName')
+          .invoke('text')
+          .then(aliceTeamName =>
+            bob().get('.TeamName').invoke('text').should('equal', aliceTeamName)
+          )
+      })
     })
   })
 })
