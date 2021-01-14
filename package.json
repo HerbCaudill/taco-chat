@@ -12,7 +12,7 @@
     "start:relay": "node ./scripts/start-relay-server.js",
     "test": "react-scripts test",
     "test:cy": "cypress open",
-    "dev:cy": "run-p dev test:cy",
+    "dev:cy": "cross-env BROWSER=none run-p dev test:cy",
     "watch": "nodemon -x yarn build:css"
   },
   "dependencies": {

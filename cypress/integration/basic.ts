@@ -6,7 +6,7 @@ describe('taco-chat', () => {
     localStorage.setItem('debug', 'lf:*')
   })
 
-  describe('on first load', () => {
+  describe('first load', () => {
     it('has just one peer, which is Alice', () => {
       cy.get('.Peer')
         // just one
@@ -25,16 +25,9 @@ describe('taco-chat', () => {
     })
   })
 
-  describe('add Bob', () => {
-    const alice = () => cy.get('.Peer').eq(0)
-    const bob = () => cy.get('.Peer').eq(1)
-
-    beforeEach(() =>
-      // select Bob from 'Add...' dropdown
-      cy.get('.Chooser select').select('Bob:laptop')
-    )
-
+  describe('we add Bob', () => {
     it('has two peers, the second of which is Bob', () => {
+      add('Bob:laptop')
       cy.get('.Peer')
         // there are two
         .should('have.length', 2)
@@ -42,49 +35,48 @@ describe('taco-chat', () => {
         .eq(1)
         .contains('Bob')
     })
+  })
 
-    describe('Bob creates another team', () => {
-      beforeEach(() => {
-        bob().findByText('Create team').click().get('.TeamName')
-      })
+  describe('Bob creates another team', () => {
+    it('has two different teams', () => {
+      add('Bob:laptop')
 
-      it('has two different teams', () => {
-        const aliceTeamName = cy.$$('.Peer:eq(0) .TeamName').text()
-        const bobTeamName = cy.$$('.Peer:eq(1) .TeamName').text()
-        // team names are different
-        cy.wrap(aliceTeamName).should('not.equal', bobTeamName)
-      })
+      // Click 'create team' and wait for the team name to show up
+      bob().findByText('Create team').click().get('.TeamName')
+
+      // team names are different
+      alice()
+        .getTeamName()
+        .then(aliceTeamName => peer('Bob').getTeamName().should('not.equal', aliceTeamName))
     })
+  })
 
-    describe('invite Bob', () => {
-      beforeEach(() => {
-        // click invite button
-        alice().findByText('Invite someone').click()
+  describe('Alice adds Bob to team', () => {
+    it('has the same team for both peers', () => {
+      add('Bob:laptop')
+      alice().addToTeam('Bob')
 
-        // invite Bob
-        alice().get('.InviteWho').select('Bob')
-        alice().findByText('Invite').click()
-        // capture invitation code
-        alice()
-          .get('pre')
-          .invoke('text')
-          .then(code => {
-            alice().findByText('Copy').click()
-            bob().findByText('Join team').click()
-            bob().get('input').type(code)
-            bob().findByText('Join').click()
-          })
-      })
+      // team names are the same
+      alice()
+        .getTeamName()
+        .then(aliceTeamName => bob().getTeamName().should('equal', aliceTeamName))
+    })
+  })
 
-      it('has the same team for both peers', () => {
-        bob().get('.MemberTable').contains('Bob')
-        alice()
-          .get('.TeamName')
-          .invoke('text')
-          .then(aliceTeamName =>
-            bob().get('.TeamName').invoke('text').should('equal', aliceTeamName)
-          )
-      })
+  describe('Alice makes Bob admin', () => {
+    it(`adds Bob as an admin on Alice's side`, () => {
+      add('Bob:laptop')
+      alice().addToTeam('Bob')
+      bob().get('.MemberTable').findByText('Bob')
+
+      alice().makeAdmin('Bob')
     })
   })
 })
+
+const peer = (name: string) => cy.get('h1').contains(name).parents('.Peer')
+
+const alice = () => peer('Alice')
+const bob = () => peer('Bob')
+
+const add = (id: string) => cy.get('.Chooser select').select(id)

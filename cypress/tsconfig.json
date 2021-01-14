@@ -5,5 +5,5 @@
     "allowJs": true,
     "types": ["cypress", "@testing-library/cypress"]
   },
-  "include": ["../node_modules/cypress", "**/*.js", "integration/basic.ts"]
+  "include": ["../node_modules/cypress", "index.d.ts", "**/*.js", "**/*.ts"]
 }

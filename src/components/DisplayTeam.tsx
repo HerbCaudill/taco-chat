@@ -65,7 +65,7 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
 
                     {/* Name & emoji */}
                     <td className="p-2">
-                      {users[m.userName].emoji} {m.userName}
+                      {users[m.userName].emoji} <span className="UserName">{m.userName}</span>
                     </td>
 
                     {/* Connection status/toggle: Laptop */}
