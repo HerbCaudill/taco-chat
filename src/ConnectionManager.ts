@@ -9,7 +9,7 @@ import debug from 'debug'
 const log = debug('lf:tc:connectionmanager')
 
 /**
- * Wraps a Client and creates a Connection instance for each peer we connect to.
+ * Wraps a Relay client and creates a Connection instance for each peer we connect to.
  */
 export class ConnectionManager extends EventEmitter {
   private client: Client
@@ -20,6 +20,7 @@ export class ConnectionManager extends EventEmitter {
 
     // connect to relay server
     this.client = new Client({ id: context.user.userName, url: urls[0] })
+    // tell relay server we're interested in a specific team
     this.client.join(teamName)
 
     this.client.on('close', () => {
@@ -28,8 +29,6 @@ export class ConnectionManager extends EventEmitter {
     })
 
     this.client.on('peer', ({ id, socket }) => {
-      // const { id, socket } = args
-      // const { id } = socket
       if (socket) {
         // connected to a new peer
         const connection = new Connection(socket, context)
@@ -37,6 +36,7 @@ export class ConnectionManager extends EventEmitter {
 
         connection.on('connected', () => this.emit('connected', connection))
         connection.on('disconnected', event => {
+          // disconnected from peer
           this.emit('disconnected', event)
           this.removePeer(id)
         })
@@ -54,6 +54,11 @@ export class ConnectionManager extends EventEmitter {
 
   public get connectionCount() {
     return Object.keys(this.connections).length
+  }
+
+  public connectionState(userName: string) {
+    const connection = this.connections[userName]
+    return connection?.state
   }
 
   public async close() {
