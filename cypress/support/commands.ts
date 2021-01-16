@@ -45,25 +45,20 @@ Cypress.Commands.add('addToTeam', { prevSubject: true }, (subject, userName: str
     .then(code => {
       peer(userName).join(code)
     })
-  return peer(userName).get('.MemberTable').findByText(userName)
+    .then(() =>
+      s()
+        .getTeamName()
+        .then(teamName => peer(userName).getTeamName().should('equal', teamName))
+    )
 })
 
-Cypress.Commands.add('getUserRow', { prevSubject: true }, (subject, userName: string) =>
-  cy.wrap(subject).get('.MemberTable').findByText(userName).parents('tr')
+Cypress.Commands.add('getUserRow', { prevSubject: true }, (subject, userName: string) => {
+  return cy.wrap(subject).find('.MemberTable').findByText(userName).parents('tr')
+})
+
+Cypress.Commands.add('makeAdmin', { prevSubject: true }, (subject, userName: string) =>
+  cy.wrap(subject).getUserRow(userName).findByTitle('Click to make team admin').click()
 )
-
-Cypress.Commands.add('makeAdmin', { prevSubject: true }, (subject, userName: string) => {
-  // TODO: The fact that we need to wait 1000ms for this to work is probably a symptom of the same
-  // bug that is making updates stop after the first one or two go through.
-
-  // After update are we getting into a different state that's no longer listening?
-
-  // At any rate it shouldn't make a difference whether we make Bob an admin after or before he's joined.
-  //
-
-  cy.wait(1000)
-  return cy.wrap(subject).getUserRow('Bob').findByTitle('Click to make team admin').click()
-})
 
 const peer = (name: string) => cy.get('h1').contains(name).parents('.Peer')
 
