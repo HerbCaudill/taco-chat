@@ -1,7 +1,6 @@
 {
   "projectId": "taco-chat",
   "baseUrl": "http://localhost:3000",
-  "pluginsFile": false,
   "fixturesFolder": false,
   "video": false,
   "viewportWidth": 1200,
