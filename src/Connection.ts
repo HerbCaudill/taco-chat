@@ -25,6 +25,9 @@ export class Connection extends Duplex {
     authConnection.on('joined', () => this.emit('joined'))
     authConnection.on('disconnected', event => this.emit('disconnected', event))
 
+    peerSocket.on('data', (chunk: any) => this.log('received', chunk.toString()))
+    authConnection.on('data', (chunk: any) => this.log('sending', chunk.toString()))
+
     this.authConnection = authConnection
   }
 
