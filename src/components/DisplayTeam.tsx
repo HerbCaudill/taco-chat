@@ -10,18 +10,23 @@ import { TeamProvider } from './TeamContext'
 import { ChainDiagram } from './ChainDiagram'
 import { DeviceInfo } from '../devices'
 
-export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
+export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connectionManager }) => {
   const [members, setMembers] = useState(team?.members())
 
   useEffect(() => {
-    setMembers(team.members())
     team.on('updated', () => setMembers(team.members()))
     return () => {
-      team.removeAllListeners
+      team.removeAllListeners()
     }
   }, [team])
 
+  useEffect(() => {
+    setMembers(team.members())
+  }, [team?.chain])
+
   const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
+
+  const getConnectionState = (userName: string) => connectionManager.connectionState(userName)
 
   return (
     <TeamProvider value={team}>
@@ -68,6 +73,7 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
                       {users[m.userName].emoji} <span className="UserName">{m.userName}</span>
                     </td>
 
+                    <td>{JSON.stringify(getConnectionState(m.userName))}</td>
                     {/* Connection status/toggle: Laptop */}
                     <td>
                       <div className="flex items-center">
@@ -75,7 +81,6 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user }) => {
                         <ConnectionToggle></ConnectionToggle>
                       </div>
                     </td>
-
                     {/* Connection status/toggle: Phone*/}
                     <td>
                       <div className="flex items-center">
