@@ -89,8 +89,12 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
                       </div>
                     </td>
                     {/* Connection status/toggle: Phone*/}
-                    {/*
-                     */}
+                    {/*<td>
+                      <div className="flex items-center">
+                        <span className="mr-2">📱</span>
+                        <ConnectionToggle disabled></ConnectionToggle>
+                      </div>
+                    </td>*/}
 
                     {/* Remove button */}
                     <td>
