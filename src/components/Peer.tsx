@@ -2,6 +2,7 @@ import * as auth from '@localfirst/auth'
 import { Connection } from '@localfirst/auth'
 import { Card, CardBody } from '@windmill/react-ui'
 import cuid from 'cuid'
+import debug from 'debug'
 import React, { useEffect, useState } from 'react'
 import { ConnectionManager } from '../ConnectionManager'
 import { PeerInfo } from '../peers'
@@ -25,11 +26,11 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
     })
   )
 
-  const newTeam = () => auth.createTeam(randomTeamName(), { user })
+  const log = debug(`lf:tc:Peer:${user.userName}`)
 
   const [alerts, setAlerts] = useState([] as AlertInfo[])
   const [team, setTeam] = useState<auth.Team | undefined>()
-  const [connectionManager, setConnectionManager] = useState<ConnectionManager | undefined>()
+  const [connections, setConnections] = useState<Record<string, string>>({})
 
   const addAlert = (message: string, type: AlertInfo['type'] = 'info') => {
     const alert = { id: cuid(), message, type }
@@ -41,38 +42,41 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
   }
 
   const createTeam = () => {
-    const team = newTeam()
+    log('creating team')
+    const team = auth.createTeam(randomTeamName(), { user })
     setTeam(team)
 
     const { teamName } = team
     const context = { user, team }
-    setConnectionManager(new ConnectionManager({ teamName, urls, context }))
+    connect(teamName, context)
   }
 
   const joinTeam = (teamName: string, invitationSeed: string) => {
+    log('joining team')
     const context = { user, invitationSeed }
-    const connectionManager = new ConnectionManager({ teamName, urls, context })
+    connect(teamName, context)
+  }
 
-    connectionManager.once('connected', (connection: Connection) => {
-      setTeam(connection.team)
-    })
+  const connect = (teamName: string, context: auth.InitialContext) => {
+    new ConnectionManager({ teamName, urls, context })
+      .on('change', state => setConnections(state))
 
-    connectionManager.on('disconnected', event => {
-      if (event.type === 'ERROR') {
-        const { message } = event.payload
-        addAlert(message)
-      }
-      // console.warn('disconnected', event)
-    })
+      .on('connected', (connection: Connection) => {
+        setTeam(connection.team)
+      })
 
-    setConnectionManager(connectionManager)
+      .on('disconnected', event => {
+        if (event.type === 'ERROR') {
+          const { message } = event.payload
+          addAlert(message)
+        }
+      })
   }
 
   // set up Alice on first load
   useEffect(() => {
     const AUTO_CREATE_ALICE_TEAM = true
     if (AUTO_CREATE_ALICE_TEAM && isAlice(peer)) createTeam()
-    // addAlert('This is a test')
   }, [])
 
   // TODO: can't have nested tailwindcss groups, so need to do custom css for group-hover
@@ -92,12 +96,7 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
         <Alerts alerts={alerts} clearAlert={clearAlert} />
 
         {team ? (
-          <DisplayTeam
-            user={user}
-            device={peer.device}
-            team={team}
-            connectionManager={connectionManager!}
-          />
+          <DisplayTeam user={user} device={peer.device} team={team} connections={connections} />
         ) : (
           <CreateOrJoinTeam user={user} createTeam={createTeam} joinTeam={joinTeam} />
         )}
