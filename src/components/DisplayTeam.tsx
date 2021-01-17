@@ -9,24 +9,22 @@ import { Invite } from './Invite'
 import { TeamProvider } from './TeamContext'
 import { ChainDiagram } from './ChainDiagram'
 import { DeviceInfo } from '../devices'
+import debug from 'debug'
 
-export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connectionManager }) => {
+export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) => {
   const [members, setMembers] = useState(team?.members())
+  const log = debug(`lf:tc:DisplayTeam:${user.userName}`)
 
   useEffect(() => {
+    log('(useEffect) wiring up team change handler')
+    setMembers(team.members())
     team.on('updated', () => setMembers(team.members()))
     return () => {
       team.removeAllListeners()
     }
   }, [team])
 
-  useEffect(() => {
-    setMembers(team.members())
-  }, [team?.chain])
-
   const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
-
-  const getConnectionState = (userName: string) => connectionManager.connectionState(userName)
 
   return (
     <TeamProvider value={team}>
@@ -34,6 +32,14 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connectionManag
         {/* Team name */}
         <CardLabel>Team</CardLabel>
         <p className="TeamName">{team.teamName}</p>
+
+        {/* <pre
+          className="my-2 p-3 
+              border border-gray-200 rounded-md bg-gray-100 
+              text-xs whitespace-pre-wrap"
+        >
+          {JSON.stringify(connections, null, 2)}
+        </pre> */}
 
         {/* Members table */}
         <table className="MemberTable w-full border-collapse text-sm my-3">
@@ -73,21 +79,18 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connectionManag
                       {users[m.userName].emoji} <span className="UserName">{m.userName}</span>
                     </td>
 
-                    <td>{JSON.stringify(getConnectionState(m.userName))}</td>
+                    <td>{connections[m.userName]}</td>
+
                     {/* Connection status/toggle: Laptop */}
                     <td>
                       <div className="flex items-center">
-                        <span className="mr-2">💻</span>
+                        {/* <span className="mr-2">💻</span> */}
                         <ConnectionToggle></ConnectionToggle>
                       </div>
                     </td>
                     {/* Connection status/toggle: Phone*/}
-                    <td>
-                      <div className="flex items-center">
-                        <span className="mr-2">📱</span>
-                        <ConnectionToggle disabled></ConnectionToggle>
-                      </div>
-                    </td>
+                    {/*
+                     */}
 
                     {/* Remove button */}
                     <td>
@@ -120,5 +123,5 @@ interface PeerWithTeamProps {
   team: auth.Team
   user: auth.User
   device: DeviceInfo
-  connectionManager: ConnectionManager
+  connections: Record<string, string>
 }
