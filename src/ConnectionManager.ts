@@ -6,17 +6,19 @@ import debug from 'debug'
 
 // TODO this probably belongs in the relay package - this would be the client we import?
 
-const log = debug('lf:tc:connectionmanager')
-
 /**
  * Wraps a Relay client and creates a Connection instance for each peer we connect to.
  */
 export class ConnectionManager extends EventEmitter {
   private client: Client
   private connections: Record<string, Connection> = {}
+  private log: debug.Debugger
+
+  public state: Record<string, string> = {}
 
   constructor({ teamName, urls, context }: ConnectionManagerOptions) {
     super()
+    this.log = debug(`lf:tc:connmgr:${context.user.userName}`)
 
     // connect to relay server
     this.client = new Client({ id: context.user.userName, url: urls[0] })
@@ -34,6 +36,15 @@ export class ConnectionManager extends EventEmitter {
         const connection = new Connection(socket, context)
         this.connections[id] = connection
 
+        connection.on('change', connectionState => {
+          this.state = {
+            ...this.state,
+            [id]: connectionState,
+          }
+          this.log('state change', { id, connectionState, state: this.state })
+          this.emit('change', this.state)
+        })
+
         connection.on('connected', () => this.emit('connected', connection))
         connection.on('disconnected', event => {
           // disconnected from peer
@@ -41,7 +52,7 @@ export class ConnectionManager extends EventEmitter {
           this.removePeer(id)
         })
       } else {
-        log('no socket')
+        this.log('no socket')
       }
     })
   }
@@ -54,11 +65,6 @@ export class ConnectionManager extends EventEmitter {
 
   public get connectionCount() {
     return Object.keys(this.connections).length
-  }
-
-  public connectionState(userName: string) {
-    const connection = this.connections[userName]
-    return connection?.state
   }
 
   public async close() {
