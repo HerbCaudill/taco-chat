@@ -2,7 +2,6 @@ import * as auth from '@localfirst/auth'
 import { Duplex } from 'stream'
 import { WebSocketDuplex } from 'websocket-stream'
 import debug from 'debug'
-
 export class Connection extends Duplex {
   authConnection: auth.Connection
   log: debug.Debugger
@@ -12,7 +11,7 @@ export class Connection extends Duplex {
     this._read = () => {}
     this._write = () => {}
 
-    this.log = debug(`lf:tc:connection:${context.user.userName}`)
+    this.log = debug(`lf:tc:conn:${context.user.userName}`)
 
     const authConnection = new auth.Connection(context)
     authConnection.start()
@@ -25,8 +24,14 @@ export class Connection extends Duplex {
     authConnection.on('joined', () => this.emit('joined'))
     authConnection.on('disconnected', event => this.emit('disconnected', event))
 
-    peerSocket.on('data', (chunk: any) => this.log('received', chunk.toString()))
-    authConnection.on('data', (chunk: any) => this.log('sending', chunk.toString()))
+    // peerSocket.on('data', (chunk: any) => this.log('received', chunk.toString()))
+    // authConnection.on('data', (chunk: any) => this.log('sending', chunk.toString()))
+
+    authConnection.on('change', state => {
+      const newState = stateSummary(state.value)
+      this.log('state change', newState)
+      this.emit('change', newState)
+    })
 
     this.authConnection = authConnection
   }
@@ -39,3 +44,13 @@ export class Connection extends Duplex {
     return this.authConnection.state
   }
 }
+
+const stateSummary = (state: any): string =>
+  isString(state)
+    ? state
+    : Object.keys(state)
+        .map(key => (state[key] === 'done' ? '' : `${key}:${stateSummary(state[key])}`))
+        .filter(s => s.length)
+        .join(',')
+
+const isString = (state: any) => typeof state === 'string'
