@@ -21,7 +21,7 @@ Cypress.Commands.add('invite', { prevSubject: true }, (subject, userName: string
 
   // capture invitation code
   return s()
-    .get('pre')
+    .get('pre.InvitationCode')
     .then(pre => {
       s().findByText('Copy').click()
       return cy.wrap(pre).invoke('text')
@@ -30,7 +30,7 @@ Cypress.Commands.add('invite', { prevSubject: true }, (subject, userName: string
 
 Cypress.Commands.add('join', { prevSubject: true }, (subject, code: string) => {
   const s = () => cy.wrap(subject)
-  s().findByText('Join team').click()
+  s().wait(100).findByText('Join team').click()
   s().get('input').type(code)
   s().findByText('Join').click()
   return s()
