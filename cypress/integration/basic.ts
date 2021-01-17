@@ -52,18 +52,22 @@ describe('taco-chat', () => {
   })
 
   describe('Alice adds Bob to team', () => {
-    it('has the same team for both peers', () => {
+    beforeEach(() => {
       add('Bob:laptop')
       alice().addToTeam('Bob')
-
-      // team names are the same
+    })
+    it('has the same team for both peers', () => {
       alice()
         .getTeamName()
         .then(aliceTeamName => bob().getTeamName().should('equal', aliceTeamName))
     })
+    it.only(`both peers have 'connected' status`, () => {
+      alice().getUserRow('Bob').should('contain', 'connected')
+      bob().getUserRow('Alice').should('contain', 'connected')
+    })
   })
 
-  describe.only('Alice makes Bob admin after he joins', () => {
+  describe('Alice makes Bob admin after he joins', () => {
     it(`adds Bob as an admin on Alice's side`, () => {
       add('Bob:laptop')
       alice().addToTeam('Bob')
