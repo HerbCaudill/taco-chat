@@ -112,7 +112,7 @@ export const Invite: FC = () => {
           <p className="my-2 font-bold">Here's the invite!</p>
           <p className="my-2">Copy this code and send it to {userName}:</p>
           <pre
-            className="my-2 p-3 
+            className="InvitationCode my-2 p-3 
               border border-gray-200 rounded-md bg-gray-100 
               text-xs whitespace-pre-wrap"
             children={seed}
