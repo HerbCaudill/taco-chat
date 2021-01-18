@@ -61,7 +61,7 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
     new ConnectionManager({ teamName, urls, context })
       .on('change', state => setConnections(state))
 
-      .on('connected', (connection: Connection) => {
+      .once('connected', (connection: Connection) => {
         setTeam(connection.team)
       })
 
