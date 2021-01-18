@@ -9,9 +9,9 @@ import { ChainDiagram } from './ChainDiagram'
 import { DeviceInfo } from '../devices'
 import debug from 'debug'
 
-export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) => {
+export const Team: FC<TeamProps> = ({ team, user, connections }) => {
   const [members, setMembers] = useState(team?.members())
-  const log = debug(`lf:tc:DisplayTeam:${user.userName}`)
+  const log = debug(`lf:tc:Team:${user.userName}`)
 
   useEffect(() => {
     log('(useEffect) wiring up team change handler')
@@ -26,7 +26,7 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
 
   return (
     <TeamProvider value={team}>
-      <CardBody className="DisplayTeam">
+      <CardBody className="Team">
         {/* Team name */}
         <CardLabel>Team</CardLabel>
         <p className="TeamName">{team.teamName}</p>
@@ -81,15 +81,15 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
                     </td>
 
                     {/* Remove button */}
-                    {team.memberIsAdmin(user.userName) ? (
-                      <td>
+                    <td>
+                      {team.memberIsAdmin(user.userName) ? (
                         <button
                           title="Remove member from team"
                           className="group-hover group-hover:opacity-100 opacity-0 font-bold"
                           children="❌"
                         />
-                      </td>
-                    ) : null}
+                      ) : null}
+                    </td>
                   </tr>
                 </Fragment>
               )
@@ -109,7 +109,8 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
     </TeamProvider>
   )
 }
-interface PeerWithTeamProps {
+
+interface TeamProps {
   team: auth.Team
   user: auth.User
   device: DeviceInfo

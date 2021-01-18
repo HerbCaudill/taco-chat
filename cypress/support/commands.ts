@@ -61,7 +61,7 @@ Cypress.Commands.add('connectionStatus', { prevSubject: true }, (subject, userNa
   return connCell.invoke('attr', 'title')
 })
 
-Cypress.Commands.add('makeAdmin', { prevSubject: true }, (subject, userName: string) =>
+Cypress.Commands.add('promote', { prevSubject: true }, (subject, userName: string) =>
   cy.wrap(subject).getUserRow(userName).findByTitle('Click to make team admin').click()
 )
 

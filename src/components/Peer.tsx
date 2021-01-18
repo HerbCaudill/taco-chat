@@ -10,7 +10,7 @@ import { randomTeamName } from '../util/randomTeamName'
 import { AlertInfo, Alerts } from './Alerts'
 import { Avatar } from './Avatar'
 import { CreateOrJoinTeam } from './CreateOrJoinTeam'
-import { DisplayTeam } from './DisplayTeam'
+import { Team } from './Team'
 import { ErrorBoundary } from './ErrorBoundary'
 import { RemoveButton } from './RemoveButton'
 
@@ -96,7 +96,7 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
         <Alerts alerts={alerts} clearAlert={clearAlert} />
 
         {team ? (
-          <DisplayTeam user={user} device={peer.device} team={team} connections={connections} />
+          <Team user={user} device={peer.device} team={team} connections={connections} />
         ) : (
           <CreateOrJoinTeam user={user} createTeam={createTeam} joinTeam={joinTeam} />
         )}
