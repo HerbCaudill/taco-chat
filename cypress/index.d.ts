@@ -8,6 +8,8 @@
     join(code: string): Chainable<Element>
     addToTeam(userName: string): Chainable<Element>
     getUserRow(userName: string): Chainable<Element>
+    connectionStatus(userName: string): Chainable<string>
     makeAdmin(userName: string): Chainable<Element>
+    removeAdmin(userName: string): Chainable<Element>
   }
 }
