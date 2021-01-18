@@ -56,8 +56,17 @@ Cypress.Commands.add('getUserRow', { prevSubject: true }, (subject, userName: st
   return cy.wrap(subject).find('.MemberTable').findByText(userName).parents('tr')
 })
 
+Cypress.Commands.add('connectionStatus', { prevSubject: true }, (subject, userName: string) => {
+  const connCell = cy.wrap(subject).getUserRow(userName).findByText('💻').parents('td').first()
+  return connCell.invoke('attr', 'title')
+})
+
 Cypress.Commands.add('makeAdmin', { prevSubject: true }, (subject, userName: string) =>
   cy.wrap(subject).getUserRow(userName).findByTitle('Click to make team admin').click()
+)
+
+Cypress.Commands.add('removeAdmin', { prevSubject: true }, (subject, userName: string) =>
+  cy.wrap(subject).getUserRow(userName).findByTitle('Team admin (click to remove)').click()
 )
 
 const peer = (name: string) => cy.get('h1').contains(name).parents('.Peer')
