@@ -41,7 +41,6 @@ export class ConnectionManager extends EventEmitter {
             ...this.state,
             [id]: connectionState,
           }
-          this.log('state change', { id, connectionState, state: this.state })
           this.emit('change', this.state)
         })
 
@@ -49,7 +48,7 @@ export class ConnectionManager extends EventEmitter {
         connection.on('disconnected', event => {
           // disconnected from peer
           this.emit('disconnected', event)
-          this.removePeer(id)
+          this.disconnect(id)
         })
       } else {
         this.log('no socket')
@@ -57,10 +56,10 @@ export class ConnectionManager extends EventEmitter {
     })
   }
 
-  private removePeer = (peerId: string) => {
+  public disconnect = (peerId: string) => {
     if (this.connections[peerId]) this.connections[peerId].end()
     delete this.connections[peerId]
-    this.emit('peer_remove', Object.keys(this.connections))
+    this.emit('disconnect', Object.keys(this.connections))
   }
 
   public get connectionCount() {
@@ -68,7 +67,7 @@ export class ConnectionManager extends EventEmitter {
   }
 
   public async close() {
-    const closeAllConnections = Object.keys(this.connections).map(peerId => this.removePeer(peerId))
+    const closeAllConnections = Object.keys(this.connections).map(peerId => this.disconnect(peerId))
     await Promise.all(closeAllConnections)
     this.connections = {}
   }
