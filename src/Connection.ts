@@ -1,15 +1,14 @@
 import * as auth from '@localfirst/auth'
-import { Duplex } from 'stream'
+import { Duplex, pipeline, Stream } from 'stream'
 import { WebSocketDuplex } from 'websocket-stream'
 import debug from 'debug'
+
 export class Connection extends Duplex {
   authConnection: auth.Connection
   log: debug.Debugger
 
   constructor(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
     super()
-    this._read = () => {}
-    this._write = () => {}
 
     this.log = debug(`lf:tc:conn:${context.user.userName}`)
 
@@ -17,24 +16,29 @@ export class Connection extends Duplex {
     authConnection.start()
 
     // this ⇆ authConnection ⇆ peerSocket
+    // pipeline(this, authConnection, peerSocket, err => {
+    //   if (err) {
+    //     console.error('Pipeline failed.', err)
+    //   } else {
+    //     console.log('Pipeline succeeded.')
+    //   }
+    // })
     this.pipe(authConnection).pipe(this)
     authConnection.pipe(peerSocket).pipe(authConnection)
 
     authConnection.on('connected', () => this.emit('connected'))
     authConnection.on('joined', () => this.emit('joined'))
     authConnection.on('disconnected', event => this.emit('disconnected', event))
+    authConnection.on('change', state => this.emit('change', stateSummary(state.value)))
 
-    // peerSocket.on('data', (chunk: any) => this.log('received', chunk.toString()))
-    // authConnection.on('data', (chunk: any) => this.log('sending', chunk.toString()))
-
-    authConnection.on('change', state => {
-      const newState = stateSummary(state.value)
-      this.log('state change', newState)
-      this.emit('change', newState)
-    })
+    // Without this, the connection hangs unpredictably. I think I probably need to understand streams a bit better.
+    authConnection.on('readable', () => authConnection.resume())
 
     this.authConnection = authConnection
   }
+
+  _read() {}
+  _write() {}
 
   get team() {
     return this.authConnection.team
