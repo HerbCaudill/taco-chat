@@ -1,10 +1,8 @@
 import * as auth from '@localfirst/auth'
 import { Button, CardBody } from '@windmill/react-ui'
 import { Fragment, FC, useEffect, useState } from 'react'
-import { ConnectionManager } from '../ConnectionManager'
 import { users } from '../users'
 import { CardLabel } from './CardLabel'
-import { ConnectionToggle } from './ConnectionToggle'
 import { Invite } from './Invite'
 import { TeamProvider } from './TeamContext'
 import { ChainDiagram } from './ChainDiagram'
@@ -33,23 +31,16 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
         <CardLabel>Team</CardLabel>
         <p className="TeamName">{team.teamName}</p>
 
-        {/* <pre
-          className="my-2 p-3 
-              border border-gray-200 rounded-md bg-gray-100 
-              text-xs whitespace-pre-wrap"
-        >
-          {JSON.stringify(connections, null, 2)}
-        </pre> */}
-
         {/* Members table */}
         <table className="MemberTable w-full border-collapse text-sm my-3">
           <tbody>
             {/* One row per member */}
             {members?.map(m => {
               const isAdmin = team.memberIsAdmin(m.userName)
+              const status = connections[m.userName]
               return (
                 <Fragment key={m.userName}>
-                  <tr className="border-t border-b group ">
+                  <tr className="border-t border-b border-gray-200 group">
                     {/* Admin icon, if admin */}
                     <td className="w-2">
                       <Button
@@ -79,31 +70,26 @@ export const DisplayTeam: FC<PeerWithTeamProps> = ({ team, user, connections }) 
                       {users[m.userName].emoji} <span className="UserName">{m.userName}</span>
                     </td>
 
-                    <td>{connections[m.userName]}</td>
-
-                    {/* Connection status/toggle: Laptop */}
-                    <td>
-                      <div className="flex items-center">
-                        {/* <span className="mr-2">💻</span> */}
-                        <ConnectionToggle></ConnectionToggle>
-                      </div>
+                    {/* Connection status: Laptop */}
+                    <td title={status}>
+                      {m.userName === user.userName ? null : (
+                        <div className="flex items-center">
+                          <span className="mr-2">💻</span>
+                          <span className={`h-3 w-3 rounded-full ${statusIndicatorCx(status)}`} />
+                        </div>
+                      )}
                     </td>
-                    {/* Connection status/toggle: Phone*/}
-                    {/*<td>
-                      <div className="flex items-center">
-                        <span className="mr-2">📱</span>
-                        <ConnectionToggle disabled></ConnectionToggle>
-                      </div>
-                    </td>*/}
 
                     {/* Remove button */}
-                    <td>
-                      <button
-                        title="Remove member from team"
-                        className="group-hover group-hover:opacity-100 opacity-0 font-bold"
-                        children="❌"
-                      />
-                    </td>
+                    {team.memberIsAdmin(user.userName) ? (
+                      <td>
+                        <button
+                          title="Remove member from team"
+                          className="group-hover group-hover:opacity-100 opacity-0 font-bold"
+                          children="❌"
+                        />
+                      </td>
+                    ) : null}
                   </tr>
                 </Fragment>
               )
@@ -128,4 +114,19 @@ interface PeerWithTeamProps {
   user: auth.User
   device: DeviceInfo
   connections: Record<string, string>
+}
+
+const statusIndicatorCx = (status: string = '') => {
+  status = status.split(':')[0]
+  switch (status) {
+    case 'idle':
+    case 'disconnected':
+      return 'bg-gray-300'
+    case 'connecting':
+      return 'yellow-300'
+    case 'connected':
+      return 'bg-green-500'
+    case 'synchronizing':
+      return 'bg-green-500 animate-ping'
+  }
 }
