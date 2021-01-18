@@ -56,38 +56,20 @@ describe('taco-chat', () => {
       add('Bob:laptop')
       alice().addToTeam('Bob')
     })
+
     it('has the same team for both peers', () => {
       alice()
         .getTeamName()
         .then(aliceTeamName => bob().getTeamName().should('equal', aliceTeamName))
     })
-    it.only(`both peers have 'connected' status`, () => {
-      alice().getUserRow('Bob').should('contain', 'connected')
-      bob().getUserRow('Alice').should('contain', 'connected')
+
+    it(`both peers have 'connected' status`, () => {
+      alice().connectionStatus('Bob').should('equal', 'connected')
+      bob().connectionStatus('Alice').should('equal', 'connected')
     })
   })
 
-  describe('Alice makes Bob admin after he joins', () => {
-    it(`adds Bob as an admin on Alice's side`, () => {
-      add('Bob:laptop')
-      alice().addToTeam('Bob')
-      alice().makeAdmin('Bob')
-
-      // alice shows bob as an admin
-      alice()
-        .getUserRow('Bob')
-        .findByTitle('Team admin (click to remove)')
-        .should('have.length', '1')
-
-      // bob shows bob as an admin
-      bob() //
-        .getUserRow('Bob')
-        .findByTitle('Team admin (click to remove)')
-        .should('have.length', '1')
-    })
-  })
-
-  describe.skip('Alice makes Bob admin before he joins', () => {
+  describe.only('Alice makes Bob admin before he joins', () => {
     // ????
     // This test is failing and I can't figure out why.
 
@@ -127,6 +109,44 @@ describe('taco-chat', () => {
             .getTeamName()
             .then(teamName => bob().getTeamName().should('equal', teamName))
         })
+    })
+  })
+
+  describe('Alice makes Bob admin after he joins', () => {
+    it(`adds Bob as an admin on Alice's side`, () => {
+      add('Bob:laptop')
+      alice().addToTeam('Bob')
+      alice().makeAdmin('Bob')
+
+      // alice shows bob as an admin
+      alice()
+        .getUserRow('Bob')
+        .findByTitle('Team admin (click to remove)')
+        .should('have.length', '1')
+
+      // bob shows bob as an admin
+      bob() //
+        .getUserRow('Bob')
+        .findByTitle('Team admin (click to remove)')
+        .should('have.length', '1')
+    })
+  })
+
+  describe('Alice makes Bob admin then removes him from admins', () => {
+    it(`adds Bob as an admin on Alice's side`, () => {
+      add('Bob:laptop')
+      alice().addToTeam('Bob')
+      alice().makeAdmin('Bob')
+      alice().removeAdmin('Bob')
+
+      // alice shows bob as an admin
+      alice().getUserRow('Bob').findByTitle('Click to make team admin').should('have.length', '1')
+
+      // bob shows bob as an admin
+      bob() //
+        .getUserRow('Bob')
+        .findByTitle('Click to make team admin')
+        .should('have.length', '1')
     })
   })
 })
