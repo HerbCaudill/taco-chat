@@ -1,7 +1,7 @@
 import * as auth from '@localfirst/auth'
-import { Duplex, pipeline, Stream } from 'stream'
-import { WebSocketDuplex } from 'websocket-stream'
 import debug from 'debug'
+import { Duplex } from 'stream'
+import { WebSocketDuplex } from 'websocket-stream'
 
 export class Connection extends Duplex {
   authConnection: auth.Connection
@@ -16,15 +16,15 @@ export class Connection extends Duplex {
     authConnection.start()
 
     // this ⇆ authConnection ⇆ peerSocket
-    // pipeline(this, authConnection, peerSocket, err => {
-    //   if (err) {
-    //     console.error('Pipeline failed.', err)
-    //   } else {
-    //     console.log('Pipeline succeeded.')
-    //   }
-    // })
     this.pipe(authConnection).pipe(this)
     authConnection.pipe(peerSocket).pipe(authConnection)
+
+    // TODO: I'd like to do this
+    // ```
+    // pipeline(this, authConnection, peerSocket)
+    // ```
+    // but pipeline is not happy with `this` being passed as a stream, maybe because it's still being constructed?
+    // error is `Object(...) is not a function`
 
     authConnection.on('connected', () => this.emit('connected'))
     authConnection.on('joined', () => this.emit('joined'))
