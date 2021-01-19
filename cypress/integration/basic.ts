@@ -1,4 +1,4 @@
-import '@testing-library/cypress'
+import { add, bob, alice, peer } from '../support'
 
 describe('taco-chat', () => {
   beforeEach(() => {
@@ -7,7 +7,7 @@ describe('taco-chat', () => {
   })
 
   describe('page loads', () => {
-    it('we see just one peer, which is Alice', () => {
+    it('we see just one peer, Alice', () => {
       cy.get('.Peer')
         // just one
         .should('have.length', 1)
@@ -30,7 +30,7 @@ describe('taco-chat', () => {
       add('Bob:laptop')
     })
 
-    it('we see two peers, the second of which is Bob', () => {
+    it('we see two peers, Alice and Bob', () => {
       cy.get('.Peer')
         // there are two
         .should('have.length', 2)
@@ -51,12 +51,8 @@ describe('taco-chat', () => {
 
       it('Bob and Alice are on two different teams', () => {
         alice()
-          .getTeamName()
-          .then(aliceTeamName =>
-            peer('Bob') //
-              .getTeamName()
-              .should('not.equal', aliceTeamName)
-          )
+          .teamName()
+          .then(teamName => peer('Bob').teamName().should('not.equal', teamName))
       })
     })
 
@@ -68,14 +64,14 @@ describe('taco-chat', () => {
             alice().promote('Bob')
             // Alice sees that Bob is an admin
             alice()
-              .getUserRow('Bob')
+              .teamMember('Bob')
               .findByTitle('Team admin (click to remove)')
               .should('have.length', '1')
 
             bob().join(code) // This kicks off the connection protocol.
             alice()
-              .getTeamName()
-              .then(teamName => bob().getTeamName().should('equal', teamName))
+              .teamName()
+              .then(teamName => bob().teamName().should('equal', teamName))
           })
       })
     })
@@ -87,8 +83,8 @@ describe('taco-chat', () => {
 
       it('has the same team for both peers', () => {
         alice()
-          .getTeamName()
-          .then(aliceTeamName => bob().getTeamName().should('equal', aliceTeamName))
+          .teamName()
+          .then(aliceTeamName => bob().teamName().should('equal', aliceTeamName))
       })
 
       it(`both peers have 'connected' status`, () => {
@@ -102,18 +98,9 @@ describe('taco-chat', () => {
           alice().promote('Bob')
         })
 
-        it.only(`Alice and Bob see that Bob is admin`, () => {
-          // Alice sees Bob is an admin
-          alice()
-            .getUserRow('Bob')
-            .findByTitle('Team admin (click to remove)')
-            .should('have.length', '1')
-
-          // bob shows bob as an admin
-          bob() //
-            .getUserRow('Bob')
-            .findByTitle('Team admin (click to remove)')
-            .should('have.length', '1')
+        it(`Alice and Bob see that Bob is admin`, () => {
+          alice().teamMember('Bob').should('be.admin')
+          bob().teamMember('Bob').should('be.admin')
         })
 
         describe('then Alice demotes Bob', () => {
@@ -122,28 +109,12 @@ describe('taco-chat', () => {
             alice().demote('Bob')
           })
 
-          it(`neither one sees Bob as admin`, () => {
-            // Alice no longer sees Bob as Admin
-            alice()
-              .getUserRow('Bob')
-              .findByTitle('Click to make team admin')
-              .should('have.length', '1')
-
-            // Neither does Bob
-            bob()
-              .getUserRow('Bob')
-              .findByTitle('Click to make team admin')
-              .should('have.length', '1')
+          it.only(`neither one sees Bob as admin`, () => {
+            alice().teamMember('Bob').should('not.be.admin')
+            bob().teamMember('Bob').should('not.be.admin')
           })
         })
       })
     })
   })
 })
-
-const peer = (name: string) => cy.get('h1').contains(name).parents('.Peer')
-
-const alice = () => peer('Alice')
-const bob = () => peer('Bob')
-
-const add = (id: string) => cy.get('.Chooser select').select(id)
