@@ -100,7 +100,9 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
           <Avatar size="lg" className="bg-opacity-75">
             {peer.user.emoji}
           </Avatar>
+
           <h1 className="text-white text-2xl font-extrabold flex-grow">{peer.user.name}</h1>
+
           <Avatar size="sm">{peer.device.emoji}</Avatar>
         </CardBody>
 
