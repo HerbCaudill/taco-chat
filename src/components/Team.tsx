@@ -8,6 +8,7 @@ import { TeamProvider } from './TeamContext'
 import { ChainDiagram } from './ChainDiagram'
 import { DeviceInfo } from '../devices'
 import debug from 'debug'
+import { StatusIndicator } from './StatusIndicator'
 
 export const Team: FC<TeamProps> = ({ team, user, connections }) => {
   const [members, setMembers] = useState(team?.members())
@@ -75,7 +76,7 @@ export const Team: FC<TeamProps> = ({ team, user, connections }) => {
                       {m.userName === user.userName ? null : (
                         <div className="flex items-center">
                           <span className="mr-2">💻</span>
-                          <span className={`h-3 w-3 rounded-full ${statusIndicatorCx(status)}`} />
+                          <StatusIndicator status={status}></StatusIndicator>
                         </div>
                       )}
                     </td>
@@ -115,19 +116,4 @@ interface TeamProps {
   user: auth.User
   device: DeviceInfo
   connections: Record<string, string>
-}
-
-const statusIndicatorCx = (status: string = '') => {
-  status = status.split(':')[0]
-  switch (status) {
-    case 'idle':
-    case 'disconnected':
-      return 'bg-gray-300'
-    case 'connecting':
-      return 'yellow-300'
-    case 'connected':
-      return 'bg-green-500'
-    case 'synchronizing':
-      return 'bg-green-500 animate-ping'
-  }
 }

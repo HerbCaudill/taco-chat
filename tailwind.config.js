@@ -33,6 +33,16 @@ module.exports = windmill({
         bold: 600,
         extrabold: 800,
       },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+      },
+      animation: {
+        wiggle: 'wiggle 1s ease-in-out infinite',
+        'spin-fast': 'spin 500ms linear infinite',
+      },
     },
   },
   variants: {
