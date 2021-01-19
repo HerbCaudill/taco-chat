@@ -8,9 +8,7 @@ describe('taco-chat', () => {
 
   describe('page loads', () => {
     it('we see just one peer, Alice', () => {
-      // just one
       cy.get('.Peer').should('have.length', 1)
-      // it's Alice
       cy.get('.Peer').userName().should('equal', 'Alice')
     })
 
@@ -96,9 +94,7 @@ describe('taco-chat', () => {
           bob().remove()
         })
         it(`we don't see Bob any more`, () => {
-          // just one
           cy.get('.Peer').should('have.length', 1)
-          // it's Alice
           cy.get('.Peer').userName().should('equal', 'Alice')
         })
         it.only('Alice sees that Bob is disconnected', () => {
