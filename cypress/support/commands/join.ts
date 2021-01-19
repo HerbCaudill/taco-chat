@@ -6,6 +6,6 @@ export const join: commandFn = (subject, code: string) => {
   s().get('input').type(code)
   s().findByText('Join').click()
   return s()
-    .getUserName()
+    .userName()
     .then(userName => s().get('.MemberTable').contains(userName))
 }

@@ -6,6 +6,7 @@ import { demote } from './commands/demote'
 import { invite } from './commands/invite'
 import { join } from './commands/join'
 import { promote } from './commands/promote'
+import { remove } from './commands/remove'
 import { teamMember } from './commands/teamMember'
 import { teamName } from './commands/teamName'
 import { userName } from './commands/userName'
@@ -16,10 +17,11 @@ Cypress.Commands.add('addToTeam', { prevSubject: true }, addToTeam)
 Cypress.Commands.add('adminButton', { prevSubject: true }, adminButton)
 Cypress.Commands.add('connectionStatus', { prevSubject: true }, connectionStatus)
 Cypress.Commands.add('demote', { prevSubject: true }, demote)
-Cypress.Commands.add('getUserName', { prevSubject: true }, userName)
+Cypress.Commands.add('userName', { prevSubject: true }, userName)
 Cypress.Commands.add('invite', { prevSubject: true }, invite)
 Cypress.Commands.add('join', { prevSubject: true }, join)
 Cypress.Commands.add('promote', { prevSubject: true }, promote)
+Cypress.Commands.add('remove', { prevSubject: true }, remove)
 Cypress.Commands.add('teamMember', { prevSubject: true }, teamMember)
 Cypress.Commands.add('teamName', { prevSubject: true }, teamName)
 
@@ -37,6 +39,7 @@ declare global {
       invite(userName: string): Chainable<string>
       join(code: string): Chainable<Element>
       promote(userName: string): Chainable<Element>
+      remove(): Chainable<Element>
       teamMember(userName: string): Chainable<Element>
       teamName(): Chainable<string>
       userName(): Chainable<string>

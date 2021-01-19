@@ -1,11 +1,16 @@
 import * as auth from '@localfirst/auth'
 import debug from 'debug'
+import { EventEmitter } from 'events'
 import { Duplex } from 'stream'
 import { WebSocketDuplex } from 'websocket-stream'
 
-export class Connection extends Duplex {
+export class Connection extends EventEmitter {
   authConnection: auth.Connection
   log: debug.Debugger
+  stream = new Duplex({
+    write: (_chunk, _encoding, next) => next(),
+    read: () => {},
+  })
 
   constructor(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
     super()
@@ -16,29 +21,16 @@ export class Connection extends Duplex {
     authConnection.start()
 
     // this ⇆ authConnection ⇆ peerSocket
-    this.pipe(authConnection).pipe(this)
+    this.stream.pipe(authConnection).pipe(this.stream)
     authConnection.pipe(peerSocket).pipe(authConnection)
-
-    // TODO: I'd like to do this
-    // ```
-    // pipeline(this, authConnection, peerSocket)
-    // ```
-    // but pipeline is not happy with `this` being passed as a stream, maybe because it's still being constructed?
-    // error is `Object(...) is not a function`
 
     authConnection.on('connected', () => this.emit('connected'))
     authConnection.on('joined', () => this.emit('joined'))
     authConnection.on('disconnected', event => this.emit('disconnected', event))
     authConnection.on('change', state => this.emit('change', stateSummary(state.value)))
 
-    // Without this, the connection hangs unpredictably. I think I probably need to understand streams a bit better.
-    authConnection.on('readable', () => authConnection.resume())
-
     this.authConnection = authConnection
   }
-
-  _read() {}
-  _write() {}
 
   get team() {
     return this.authConnection.team
@@ -46,6 +38,11 @@ export class Connection extends Duplex {
 
   get state() {
     return this.authConnection.state
+  }
+
+  public disconnect() {
+    this.authConnection.stop()
+    this.stream.end()
   }
 }
 

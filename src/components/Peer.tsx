@@ -31,6 +31,7 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
   const [alerts, setAlerts] = useState([] as AlertInfo[])
   const [team, setTeam] = useState<auth.Team | undefined>()
   const [connections, setConnections] = useState<Record<string, string>>({})
+  const [connectionManager, setConnectionManager] = useState<ConnectionManager>()
 
   const addAlert = (message: string, type: AlertInfo['type'] = 'info') => {
     const alert = { id: cuid(), message, type }
@@ -58,19 +59,18 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
   }
 
   const connect = (teamName: string, context: auth.InitialContext) => {
-    new ConnectionManager({ teamName, urls, context })
-      .on('change', state => setConnections(state))
-
+    const connectionManager = new ConnectionManager({ teamName, urls, context })
+      .on('change', () => {
+        return setConnections(connectionManager.state)
+      })
       .once('connected', (connection: Connection) => {
         setTeam(connection.team)
       })
-
-      .on('disconnected', event => {
-        if (event.type === 'ERROR') {
-          const { message } = event.payload
-          addAlert(message)
-        }
-      })
+      .on('disconnected', (id, event) => {
+        if (event?.type === 'ERROR') addAlert(event.payload.message)
+        setConnections(connectionManager.state)
+      }) as ConnectionManager
+    setConnectionManager(connectionManager)
   }
 
   // set up Alice on first load
@@ -79,11 +79,22 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
     if (AUTO_CREATE_ALICE_TEAM && isAlice(peer)) createTeam()
   }, [])
 
+  useEffect(() => {
+    return () => {
+      connectionManager?.close()
+    }
+  }, [])
+
+  const remove = async () => {
+    await connectionManager?.close()
+    onRemove(peer.id)
+  }
+
   // TODO: can't have nested tailwindcss groups, so need to do custom css for group-hover
   return (
     <ErrorBoundary>
       <Card className="Peer group max-w-sm flex-1 bg-white shadow-md relative">
-        <RemoveButton onClick={() => onRemove(peer.id)}></RemoveButton>
+        <RemoveButton onClick={remove}></RemoveButton>
 
         <CardBody className="Header flex items-center bg-teal-500">
           <Avatar size="lg" className="bg-opacity-75">

@@ -25,6 +25,7 @@ export const Team: FC<TeamProps> = ({ team, user, connections }) => {
 
   const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
 
+  log('render', { connections })
   return (
     <TeamProvider value={team}>
       <CardBody className="Team">
@@ -38,7 +39,7 @@ export const Team: FC<TeamProps> = ({ team, user, connections }) => {
             {/* One row per member */}
             {members?.map(m => {
               const isAdmin = team.memberIsAdmin(m.userName)
-              const status = connections[m.userName]
+              const status = connections[m.userName] || 'disconnected'
               return (
                 <Fragment key={m.userName}>
                   <tr className="border-t border-b border-gray-200 group">

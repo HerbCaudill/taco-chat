@@ -41,25 +41,23 @@ export class ConnectionManager extends EventEmitter {
             ...this.state,
             [id]: connectionState,
           }
-          this.emit('change', this.state)
+          this.emit('change')
         })
 
         connection.on('connected', () => this.emit('connected', connection))
-        connection.on('disconnected', event => {
-          // disconnected from peer
-          this.emit('disconnected', event)
-          this.disconnect(id)
-        })
+        connection.on('disconnected', event => this.disconnect(id, event))
       } else {
         this.log('no socket')
       }
     })
   }
 
-  public disconnect = (peerId: string) => {
-    if (this.connections[peerId]) this.connections[peerId].end()
-    delete this.connections[peerId]
-    this.emit('disconnect', Object.keys(this.connections))
+  public disconnect = (id: string, event?: any) => {
+    if (this.connections[id]) this.connections[id].disconnect()
+    delete this.connections[id]
+    const { [id]: toDelete, ...rest } = this.state
+    this.state = rest
+    this.emit('disconnected', id, event)
   }
 
   public get connectionCount() {

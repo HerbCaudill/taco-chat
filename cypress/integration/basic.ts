@@ -8,11 +8,10 @@ describe('taco-chat', () => {
 
   describe('page loads', () => {
     it('we see just one peer, Alice', () => {
-      cy.get('.Peer')
-        // just one
-        .should('have.length', 1)
-        // it's Alice
-        .contains('Alice')
+      // just one
+      cy.get('.Peer').should('have.length', 1)
+      // it's Alice
+      cy.get('.Peer').userName().should('equal', 'Alice')
     })
 
     it('we see the signature chain', () => {
@@ -92,6 +91,21 @@ describe('taco-chat', () => {
         bob().connectionStatus('Alice').should('equal', 'connected')
       })
 
+      describe('then we remove Bob', () => {
+        beforeEach(() => {
+          bob().remove()
+        })
+        it(`we don't see Bob any more`, () => {
+          // just one
+          cy.get('.Peer').should('have.length', 1)
+          // it's Alice
+          cy.get('.Peer').userName().should('equal', 'Alice')
+        })
+        it.only('Alice sees that Bob is disconnected', () => {
+          alice().connectionStatus('Bob').should('equal', 'disconnected')
+        })
+      })
+
       describe('Alice promotes Bob', () => {
         beforeEach(() => {
           // Alice makes Bob an admin
@@ -109,7 +123,7 @@ describe('taco-chat', () => {
             alice().demote('Bob')
           })
 
-          it.only(`neither one sees Bob as admin`, () => {
+          it(`neither one sees Bob as admin`, () => {
             alice().teamMember('Bob').should('not.be.admin')
             bob().teamMember('Bob').should('not.be.admin')
           })
