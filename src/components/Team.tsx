@@ -25,7 +25,6 @@ export const Team: FC<TeamProps> = ({ team, user, connections }) => {
 
   const adminCount = () => members.filter(m => team.memberIsAdmin(m.userName)).length
 
-  log('render', { connections })
   return (
     <TeamProvider value={team}>
       <CardBody className="Team">
