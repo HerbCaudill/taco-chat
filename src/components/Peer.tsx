@@ -89,7 +89,6 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
       .on('connected', (connection: Connection) => {
         // get the latest team info from the connection
         setTeam(connection.team!)
-        log('*********** connected', connection.team?.chain.head.slice(0, 5))
       })
       .on('disconnected', (_id, event) => {
         if (event?.type === 'ERROR') addAlert(event.payload.message)
