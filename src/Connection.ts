@@ -1,35 +1,37 @@
 import * as auth from '@localfirst/auth'
 import debug from 'debug'
-import { EventEmitter } from 'events'
+import { EventEmitter } from './EventEmitter'
 import { Duplex } from 'stream'
 import { WebSocketDuplex } from 'websocket-stream'
 
+const NOOP = () => {}
+
 export class Connection extends EventEmitter {
   authConnection: auth.Connection
-  log: debug.Debugger
-  stream = new Duplex({
-    write: (_chunk, _encoding, next) => next(),
-    read: () => {},
-  })
+  stream = new Duplex({ write: NOOP, read: NOOP })
 
   constructor(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
     super()
-
     this.log = debug(`lf:tc:conn:${context.user.userName}`)
+    this.authConnection = this.connect(peerSocket, context)
+  }
 
-    const authConnection = new auth.Connection(context)
-    authConnection.start()
+  public connect(peerSocket: WebSocketDuplex, context: auth.InitialContext) {
+    const authConnection = new auth.Connection(context).start()
 
     // this ⇆ authConnection ⇆ peerSocket
-    this.stream.pipe(authConnection).pipe(this.stream)
     authConnection.pipe(peerSocket).pipe(authConnection)
+    this.stream.pipe(authConnection).pipe(this.stream)
 
-    authConnection.on('connected', () => this.emit('connected'))
-    authConnection.on('joined', () => this.emit('joined'))
-    authConnection.on('disconnected', event => this.emit('disconnected', event))
-    authConnection.on('change', state => this.emit('change', stateSummary(state.value)))
+    pipeEvents(authConnection, this, ['connected', 'joined', 'disconnected', 'change'])
 
-    this.authConnection = authConnection
+    peerSocket.on('close', () => this.disconnect())
+
+    return authConnection
+  }
+
+  public disconnect() {
+    this.authConnection.stop()
   }
 
   get team() {
@@ -39,19 +41,7 @@ export class Connection extends EventEmitter {
   get state() {
     return this.authConnection.state
   }
-
-  public disconnect() {
-    this.authConnection.stop()
-    this.stream.end()
-  }
 }
 
-const stateSummary = (state: any): string =>
-  isString(state)
-    ? state
-    : Object.keys(state)
-        .map(key => (state[key] === 'done' ? '' : `${key}:${stateSummary(state[key])}`))
-        .filter(s => s.length)
-        .join(',')
-
-const isString = (state: any) => typeof state === 'string'
+const pipeEvents = (source: EventEmitter, target: EventEmitter, events: string[]) =>
+  events.forEach(event => source.on(event, payload => target.emit(event, payload)))
