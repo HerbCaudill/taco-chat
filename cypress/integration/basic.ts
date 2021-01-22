@@ -53,7 +53,7 @@ describe('taco-chat', () => {
       })
     })
 
-    describe('Alice makes Bob admin before he joins', () => {
+    describe('Alice promotes Bob before he joins', () => {
       it(`Alice sees that Bob is an admin`, () => {
         alice()
           .invite('Bob')
@@ -93,12 +93,27 @@ describe('taco-chat', () => {
         beforeEach(() => {
           bob().remove()
         })
+
         it(`we don't see Bob any more`, () => {
           cy.get('.Peer').should('have.length', 1)
           cy.get('.Peer').userName().should('equal', 'Alice')
         })
-        it.only('Alice sees that Bob is disconnected', () => {
+        it('Alice sees that Bob is disconnected', () => {
           alice().connectionStatus('Bob').should('equal', 'disconnected')
+        })
+
+        describe('then we add Bob back', () => {
+          beforeEach(() => {
+            console.log('---------------------------------')
+            add('Bob:laptop')
+            // TODO: now this is failing with "I couldn't verify your identity"
+            // probably because Bob's keys haven't been updated somewhere
+            // (same reason Bob can't do admin stuff even if he's admin)
+          })
+          it('Bob rejoins the team ', () => {
+            cy.get('.Peer').should('have.length', 2)
+            alice().connectionStatus('Bob').should('equal', 'connected')
+          })
         })
       })
 
@@ -111,6 +126,13 @@ describe('taco-chat', () => {
         it(`Alice and Bob see that Bob is admin`, () => {
           alice().teamMember('Bob').should('be.admin')
           bob().teamMember('Bob').should('be.admin')
+        })
+
+        describe('Bob invites Charlie', () => {
+          beforeEach(() => {
+            bob().invite('Charlie')
+          })
+          it.only(`doesn't throw an error`, () => {})
         })
 
         describe('then Alice demotes Bob', () => {
