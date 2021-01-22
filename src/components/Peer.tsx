@@ -26,12 +26,34 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
     })
   )
 
-  const log = debug(`lf:tc:Peer:${user.userName}`)
+  const log = debug(`lf:tc:peer:${user.userName}`)
 
   const [alerts, setAlerts] = useState([] as AlertInfo[])
-  const [team, setTeam] = useState<auth.Team | undefined>()
+  const [team, _setTeam] = useState<auth.Team | undefined>()
   const [connections, setConnections] = useState<Record<string, string>>({})
   const [connectionManager, setConnectionManager] = useState<ConnectionManager>()
+
+  useEffect(() => {
+    if (peer.team) {
+      log('reconnecting to', peer.team.teamName)
+      setTeam(peer.team)
+      const context = { user, team: peer.team }
+      connect(peer.team.teamName, context)
+    } else {
+      // set up Alice on first load
+      const AUTO_CREATE_ALICE_TEAM = true
+      if (AUTO_CREATE_ALICE_TEAM && isAlice(peer)) createTeam()
+    }
+  }, [peer])
+
+  const setTeam = (newTeam: auth.Team) => {
+    _setTeam((oldTeam?: auth.Team) => {
+      if (!oldTeam) return newTeam
+      const team = oldTeam.merge(newTeam.chain)
+      peer.team = team
+      return team
+    })
+  }
 
   const addAlert = (message: string, type: AlertInfo['type'] = 'info') => {
     const alert = { id: cuid(), message, type }
@@ -45,6 +67,7 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
   const createTeam = () => {
     log('creating team')
     const team = auth.createTeam(randomTeamName(), { user })
+
     setTeam(team)
 
     const { teamName } = team
@@ -63,30 +86,20 @@ export const Peer = ({ peer, onRemove }: PeerProps) => {
       .on('change', () => {
         return setConnections(connectionManager.state)
       })
-      .once('connected', (connection: Connection) => {
-        setTeam(connection.team)
+      .on('connected', (connection: Connection) => {
+        // get the latest team info from the connection
+        setTeam(connection.team!)
+        log('*********** connected', connection.team?.chain.head.slice(0, 5))
       })
-      .on('disconnected', (id, event) => {
+      .on('disconnected', (_id, event) => {
         if (event?.type === 'ERROR') addAlert(event.payload.message)
         setConnections(connectionManager.state)
       }) as ConnectionManager
     setConnectionManager(connectionManager)
   }
 
-  // set up Alice on first load
-  useEffect(() => {
-    const AUTO_CREATE_ALICE_TEAM = true
-    if (AUTO_CREATE_ALICE_TEAM && isAlice(peer)) createTeam()
-  }, [])
-
-  useEffect(() => {
-    return () => {
-      connectionManager?.close()
-    }
-  }, [])
-
   const remove = async () => {
-    await connectionManager?.close()
+    await connectionManager?.disconnectServer()
     onRemove(peer.id)
   }
 
