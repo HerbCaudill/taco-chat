@@ -1,6 +1,7 @@
 ﻿import { arrayToMap } from './util/arrayToMap'
 import { DeviceInfo, devices as deviceMap } from './devices'
 import { UserInfo, users as userMap } from './users'
+import { Team } from '@localfirst/auth'
 
 const users = Object.values(userMap)
 const devices = Object.values(deviceMap)
@@ -24,6 +25,7 @@ export interface PeerInfo {
   device: DeviceInfo
   id: string
   added: boolean
+  team?: Team
 }
 
 export type PeerMap = Record<string, PeerInfo>
