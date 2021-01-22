@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
+import { peers as allPeers } from '../peers'
 import { Chooser } from './Chooser'
 import { Peer } from './Peer'
-import { peers as allPeers, PeerMap } from '../peers'
 
 // 👩🏾💻 Add Alice's laptop by default
 allPeers['Alice:laptop'].added = true
 
 export const App = () => {
-  const [peers, setPeers] = useState<PeerMap>(allPeers)
+  const [peers, setPeers] = useState(allPeers)
 
   const setAdded = (v: boolean) => (id: string) =>
     setPeers(peers => ({ ...peers, [id]: { ...peers[id], added: v } }))
