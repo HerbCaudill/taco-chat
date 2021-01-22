@@ -52,6 +52,7 @@ export const Invite: FC = () => {
     setSeed(invitationSeed)
 
     // TODO store id so we can revoke the invitation
+    if (userName === 'Charlie') debugger
     const { id } = team.invite(userName, { invitationSeed })
 
     setState('done')
