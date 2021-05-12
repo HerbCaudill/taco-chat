@@ -45,7 +45,7 @@
     "mermaid": "^8.8.4",
     "nodemon": "2",
     "npm-run-all": "4",
-    "postcss": "7",
+    "postcss": "8",
     "postcss-cli": "7",
     "react": "17",
     "react-dom": "17",
