@@ -42,7 +42,7 @@
     "debug": "^4.3.1",
     "friendly-words": "1",
     "keycode": "^2.2.0",
-    "mermaid": "^8.8.4",
+    "mermaid": "^8.13.8",
     "nodemon": "2",
     "npm-run-all": "4",
     "postcss": "7",
